@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ChangeAccountDetailsActivity">
+
+    <EditText
+        android:id="@+id/first_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:hint="First Name"
+android:text="@{Utilities.getFirstName(viewModel.getUserName())}"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/my_toolbar"
+       />
+
+    <EditText
+        android:id="@+id/last_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:hint="Last Name"
+        android:text="@{Utilities.getLastName(viewModel.getUserName())}"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/first_name" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/white"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent"
+
+
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+    android:setNameVisibility="@{viewModel.needToEdit}"
+        app:constraint_referenced_ids="first_name,last_name,button_save" />
+<!--  android:visibility="@{viewModel.groupVisibility.nameGroup}"-->
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/last_name"
+        android:background="@drawable/button_background"
+        android:backgroundTint="@color/colorAccent"
+        android:text="Save"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="32dp"
+        android:textColor="@android:color/white"
+        />
+
+
+    <EditText
+        android:id="@+id/country_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Country code"
+        app:layout_constraintHorizontal_weight="1"
+        android:text="@{viewModel.countryCode}"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/phone"
+        app:layout_constraintTop_toTopOf="@id/phone"
+
+
+        />
+
+
+
+
+    <EditText
+        android:id="@+id/phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:hint="Phone Number"
+        app:layout_constraintHorizontal_weight="3"
+        android:isNull="@{viewModel.phoneNumber}"
+        android:text="@{viewModel.phoneNumber}"
+
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/country_code"
+        app:layout_constraintTop_toBottomOf="@id/first_name" />
+
+
+
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:setPhoneVisibility="@{viewModel.needToEdit}"
+        app:constraint_referenced_ids="phone,button_savephone,country_code" />
+
+    <Button
+        android:id="@+id/button_savephone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/phone"
+        android:background="@drawable/button_background"
+        android:backgroundTint="@color/colorAccent"
+        android:text="Save"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="32dp"
+        android:textColor="@android:color/white"
+        />
+
+
+
+
+
+    <EditText
+        android:id="@+id/reset_mail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:hint="Enter email to reset password"
+
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
+
+    <Button
+        android:id="@+id/button_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/reset_mail"
+        android:background="@drawable/button_background"
+        android:backgroundTint="@color/colorAccent"
+        android:text="Submit"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="32dp"
+        android:textColor="@android:color/white"
+        />
+
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+android:setPasswordVisibility="@{viewModel.needToEdit}"
+        app:constraint_referenced_ids="reset_mail,button_reset" />
+<!--  android:visibility="@{viewModel.groupVisibility.passwordGroup}"-->
+
+    <TextView
+        android:id="@+id/delete_account"
+        app:layout_constraintTop_toBottomOf="@id/my_toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="32dp"
+        android:textAlignment="center"
+        android:text="This will delete your entire account and remove you from all circle!!"
+        android:layout_width="match_parent"
+        style="@style/TextAppearance.AppCompat.Title"
+
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/delete_account"
+        android:background="@drawable/button_background"
+        android:backgroundTint="@color/colorAccent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="64dp"
+        android:padding="16dp"
+        android:textColor="@android:color/white"
+        android:text="Delete Account"
+/>
+
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:setDeletetVisibility="@{viewModel.needToEdit}"
+        app:constraint_referenced_ids="button_delete,delete_account"/>
+
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/my_toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/tv_circle_heading"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_margin="32dp"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You are going to Leave this circle.Are your sure you want to leave?"/>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/tv_circle_heading"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="32dp"
+        android:id="@+id/circle_name"
+        android:textAlignment="center"
+        android:hint="Circle Name"
+        android:text="@{viewModel.circleName}"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+    <Button
+        android:id="@+id/button_leave"
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+        android:layout_margin="64dp"
+        android:background="@drawable/button_background"
+        android:backgroundTint="@color/colorAccent"
+        android:leaveButtonSetClickable="@{viewModel.circleName}"
+        android:text="Leave This Circle"
+        android:padding="16dp"
+
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@id/circle_name" />
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_leave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:setLeaveVisibility="@{viewModel.needToEdit}"
+        app:constraint_referenced_ids="button_leave,circle_name,tv_circle_heading"/>
+
+    <EditText
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/my_toolbar"
+       app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="32dp"
+android:inputType="text"
+        android:maxLines="10"
+        android:hint="Message"
+        />
+    <Button
+        android:id="@+id/send_feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/message"
+        app:layout_constraintStart_toStartOf="@id/message"
+        app:layout_constraintEnd_toEndOf="@id/message"
+        android:layout_margin="32dp"
+        android:text="Send"
+        android:background="@drawable/button_border"/>
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/feedback_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:setFeedbackVisibility="@{viewModel.needToEdit}"
+        app:constraint_referenced_ids="message,send_feedback"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <data>
+        <import type="com.androidapps.sharelocation.Utilities"/>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.androidapps.sharelocation.AccountDetailViewModel" />
+    </data>
+</layout>

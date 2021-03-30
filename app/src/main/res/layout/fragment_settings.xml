@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+
+    <TextView
+        android:id="@+id/account_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:text="Account Details"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/change_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Edit Name"
+        android:drawablePadding="16dp"
+        android:drawableStart="@drawable/ic_account"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/change_number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image_dp" />
+
+    <TextView
+        android:id="@+id/change_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Edit Phone Number"
+        android:drawablePadding="16dp"
+        android:drawableStart="@drawable/ic_phone"
+        android:textStyle="bold"
+        style="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintTop_toBottomOf="@id/change_name"
+        app:layout_constraintBottom_toTopOf="@id/change_password"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+
+
+    <TextView
+        android:id="@+id/change_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Edit Password"
+        android:drawablePadding="16dp"
+        android:drawableStart="@drawable/ic_password"
+        android:textStyle="bold"
+       app:layout_constraintBottom_toTopOf="@id/leave_circle"
+        style="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/change_number" />
+
+
+    <TextView
+        android:id="@+id/delete_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Delete Account"
+        android:drawablePadding="16dp"
+        android:drawableStart="@drawable/ic_account"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tv_feedback"
+
+style="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/log_out" />
+
+    <TextView
+        android:id="@+id/leave_circle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Leave Circle"
+        android:drawablePadding="16dp"
+        android:drawableStart="@drawable/ic_leave_circle"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/log_out"
+       app:layout_constraintTop_toBottomOf="@id/change_password"
+        style="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintStart_toStartOf="parent"
+       />
+
+    <TextView
+        android:id="@+id/log_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Log Out"
+        android:drawablePadding="16dp"
+        android:drawableStart="@drawable/ic_logout"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/delete_account"
+        app:layout_constraintTop_toBottomOf="@id/leave_circle"
+        style="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/image_dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_margin="32dp"
+        android:src="@drawable/ic_dp_placeholder"
+        app:civ_border_color="#FFffff"
+        app:civ_border_width="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/account_details" />
+    <ImageView
+        app:layout_constraintTop_toTopOf="@id/image_dp"
+
+        app:layout_constraintStart_toEndOf="@id/image_dp"
+       android:layout_margin="16dp"
+        android:src="@drawable/ic_edit"
+        android:id="@+id/edit_dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <ImageView
+        app:layout_constraintTop_toBottomOf="@id/edit_dp"
+        app:layout_constraintBottom_toBottomOf="@id/image_dp"
+        app:layout_constraintStart_toEndOf="@id/image_dp"
+
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_delete"
+        android:id="@+id/delete_dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/tv_feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Send Feedback"
+        android:drawablePadding="16dp"
+        android:drawableStart="@drawable/ic_baseline_feedback_24"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        style="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/delete_account" />
+</androidx.constraintlayout.widget.ConstraintLayout>

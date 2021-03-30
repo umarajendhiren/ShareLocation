@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2" />
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/get_started_group"
+        app:constraint_referenced_ids="driver_hint,switch_select,get_started_button,tv_rider,tv_driver"/>
+    <TextView
+        android:id="@+id/tv_driver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/switch_select"
+        app:layout_constraintTop_toTopOf="@id/switch_select"
+        app:layout_constraintBottom_toBottomOf="@id/switch_select"
+        android:text="Driver"
+        android:layout_margin="32dp"
+        style="@style/TextAppearance.AppCompat.Title"
+/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch_select"
+      app:layout_constraintTop_toBottomOf="@id/driver_hint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/guideline"
+        android:id="@+id/driver_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/switch_select"
+        app:layout_constraintStart_toStartOf="@id/switch_select"
+        app:layout_constraintEnd_toEndOf="@id/switch_select"
+        android:textStyle="bold"
+        android:visibility="gone"
+
+        android:padding="32dp"/>
+    <TextView
+        android:id="@+id/tv_rider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/switch_select"
+        app:layout_constraintTop_toTopOf="@id/switch_select"
+        app:layout_constraintBottom_toBottomOf="@id/switch_select"
+        android:text="Rider"
+        android:layout_margin="32dp"
+        style="@style/TextAppearance.AppCompat.Title"
+        />
+
+
+
+    <Button
+        android:id="@+id/get_started_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/button_background"
+        android:text="Get Started"
+        android:textColor="@color/white"
+        android:padding="16dp"
+        android:layout_margin="32dp"/>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--   <TextView
+        android:id="@+id/driver_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/switch_select"
+        app:layout_constraintStart_toStartOf="@id/switch_select"
+        app:layout_constraintEnd_toEndOf="@id/switch_select"
+       android:visibility="gone"
+        android:text="If you are driver,you can register here and share your code with your rider.so they can track you on map"
+        android:padding="32dp" />
+    <TextView
+        android:id="@+id/rider_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/switch_select"
+        app:layout_constraintStart_toStartOf="@id/switch_select"
+        app:layout_constraintEnd_toEndOf="@id/switch_select"
+        android:visibility="gone"
+        android:text="If your kid going to school by auto or school bus,you can track your driver here.\n\nif you are going to office by bus you can find your driver here."
+        android:padding="32dp" />-->

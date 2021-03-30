@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <Button
+        android:id="@+id/btn_continue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:background="@drawable/button_background"
+        android:padding="16dp"
+        android:text="Continue"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+     <FrameLayout
+         android:id="@+id/dp_container"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:padding="6dp"
+         android:layout_margin="32dp"
+         app:layout_constraintTop_toBottomOf="@+id/tv_tip"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintEnd_toEndOf="parent"
+         >
+         <!--android:background="@drawable/dp_background"-->
+
+         <de.hdodenhof.circleimageview.CircleImageView
+             android:id="@+id/image_dp"
+             android:layout_width="100dp"
+             android:layout_height="100dp"
+             app:civ_border_width="5dp"
+             app:civ_border_color="@color/colorAccent"
+             android:src="@drawable/ic_persion"/>
+
+     </FrameLayout>
+
+    <Button
+        android:id="@+id/btn_add_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="80dp"
+        app:layout_constraintTop_toBottomOf="@id/dp_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/button_background"
+
+android:textColor="@color/white"
+
+        android:text="Add Photo"
+        />
+
+
+    <TextView
+        android:id="@+id/tv_title"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Add your photo"
+        android:textAlignment="center"
+
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline" />
+
+    <TextView
+        android:id="@+id/tv_tip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:text="This makes it easy for your family to find you on the map."
+        android:textAlignment="center"
+
+        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

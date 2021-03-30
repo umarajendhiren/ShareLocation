@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+   >
+
+<androidx.constraintlayout.widget.ConstraintLayout
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+
+    >
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+  <!--  <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:padding="16dp"
+        android:orientation="horizontal"
+
+        android:background="@drawable/button_background"
+        android:layout_gravity="center_horizontal">-->
+
+    <Button
+        android:layout_margin="32dp"
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+
+android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+       android:layout_marginEnd="16dp"
+android:background="@drawable/button_border"
+        android:id="@+id/group_name"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+    </Button>
+
+
+
+   <!--  </LinearLayout>-->
+
+    <ImageView
+        android:id="@+id/add_person_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+android:layout_margin="24dp"
+        android:src="@drawable/ic_person_add"
+app:layout_constraintTop_toTopOf="@id/group_name"
+        app:layout_constraintBottom_toBottomOf="@id/group_name"
+        app:layout_constraintStart_toEndOf="@id/group_name"
+
+
+        />
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+
+        android:id="@+id/bottom_navigation_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+       android:background="@drawable/bottom_navigation_background"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="5dp"
+
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="40dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+
+        <View
+            android:layout_width="50dp"
+
+            android:layout_height="10dp"
+            android:layout_gravity="center"
+            android:background="@color/colorAccent"
+           />
+       <androidx.recyclerview.widget.RecyclerView
+           android:id="@+id/recycler_view"
+
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_margin="8dp"
+           />
+
+        <TextView
+            android:id="@+id/tv_add_member"
+            android:text="+Add a new member"
+            android:clickable="true"
+            android:textColor="@color/colorAccent"
+            android:layout_width="match_parent"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginBottom="30dp"
+            />
+
+    </LinearLayout>
+
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

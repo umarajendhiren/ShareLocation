@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".CreateAndJoinCircleActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/my_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/white"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:layout_constraintStart_toStartOf="parent"
+
+            app:layout_constraintTop_toTopOf="parent"
+
+
+            />
+
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:setVisibilityForFragment="@{viewmodel.selectedFragmentInstance}"
+            app:constraint_referenced_ids="create_circle_fragment" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:setVisibilityForFragment="@{viewmodel.selectedFragmentInstance}"
+            app:constraint_referenced_ids="join_circle_fragment" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_add_dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:setVisibilityForFragment="@{viewmodel.selectedFragmentInstance}"
+            app:constraint_referenced_ids="add_circle_dp" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_add_person"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:setVisibilityForFragment="@{viewmodel.selectedFragmentInstance}"
+            app:constraint_referenced_ids="add_person_fragment" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_existing_circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:setVisibilityForFragment="@{viewmodel.selectedFragmentInstance}"
+            app:constraint_referenced_ids="existing_circle_fragment" />
+
+        <fragment
+            android:id="@+id/create_circle_fragment"
+            android:name="com.androidapps.sharelocation.CreateNewCircleFragmetForDialog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/my_toolbar"
+
+            />
+
+        <fragment
+            android:id="@+id/join_circle_fragment"
+            android:name="com.androidapps.sharelocation.JoinCircleFragmentForDialog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/my_toolbar"
+
+            />
+
+        <fragment
+            android:id="@+id/add_person_fragment"
+            android:name="com.androidapps.sharelocation.AddPersonFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
+
+        <fragment
+            android:id="@+id/existing_circle_fragment"
+            android:name="com.androidapps.sharelocation.ExstingCircleNameForInviteCode"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
+
+
+        <fragment
+            android:id="@+id/add_circle_dp"
+            android:name="com.androidapps.sharelocation.CircleDpFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
+        <fragment
+            android:id="@+id/no_network"
+            android:name="com.androidapps.sharelocation.NoNetworkFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/my_toolbar"/>
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_no_network"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:setVisibilityForFragment="@{viewmodel.selectedFragmentInstance}"
+            app:constraint_referenced_ids="no_network" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.androidapps.sharelocation.CreateJoinViewModel" />
+    </data>
+</layout>

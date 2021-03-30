@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="pojo"
+            type="com.androidapps.sharelocation.UserDetailsPojo" />
+        <variable
+            name="viewModel"
+            type="com.androidapps.sharelocation.RiderViewModel" />
+        <variable
+            name="callListener"
+            type="com.androidapps.sharelocation.OnClickCallListener" />
+        <import type="android.content.Context"/>
+      <!--  <variable
+            name="fragment"
+            type="com.androidapps.sharelocation.DriverMapFragment" />-->
+        <!--<variable
+            name="callListener"
+            type="com.androidapps.sharelocation.DriverListBottomSheetAdapter.OnPhoneCallClickInterface" />
+
+-->
+    </data>
+
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+     android:onClick="@{()->viewModel.startDriving(String.valueOf(pojo.userObjectId),pojo.latitude,pojo.longitude)}"
+
+    >
+<!--android:onClick="@{()->viewModel.userCurrentLocation(pojo.latitude,pojo.longitude)}"-->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imageView_userDp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="8dp"
+        app:civ_border_width="3dp"
+
+        app:civ_border_color="@android:color/white"
+      android:setImageSrc="@{pojo.userDp}"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_name"
+        android:text="@{pojo.userName}"
+
+        style="@style/TextAppearance.AppCompat.Title"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imageView_userDp"
+        android:ellipsize="end"
+        android:maxLines="1"
+
+       />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/driver_noitfication"
+        android:src="@drawable/ic__bus_stop"
+
+       android:onClick="@{()->viewModel.setDriverNotification(String.valueOf(pojo.userObjectId))}"
+
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"
+
+        app:layout_constraintTop_toTopOf="@id/user_name"
+       app:layout_constraintEnd_toEndOf="parent"
+
+
+        />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/user_name"
+
+       app:layout_constraintStart_toStartOf="@id/user_name"
+
+        android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:textStyle="bold"
+        android:userId="@{pojo.userObjectId}"
+        android:viewModel="@{viewModel}"
+        android:originLatitude="@{pojo.latitude}"
+        android:originLongitude="@{pojo.longitude}"
+        android:destinationLatitude="@{pojo.destinationLatitude}"
+        android:destinationLongitude="@{pojo.destinationLongitude}"
+
+        />
+<!--     android:distance="@{pojo.distanceInMiles}"   android:text="@{String.valueOf(pojo.distanceInMiles).concat(@string/space).concat(@string/miles)}"/>
+-->
+    <TextView
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText_address"
+        android:layout_marginTop="8dp"
+android:padding="3dp"
+        android:text="@{pojo.userCurrentLocation}"
+        android:textStyle="bold"
+
+        app:layout_constraintTop_toBottomOf="@id/distance"
+        app:layout_constraintStart_toStartOf="@id/user_name"
+        android:ellipsize="end"
+        android:maxLines="2"
+
+
+       />
+
+
+    <Button
+        android:id="@+id/btn_start"
+        app:layout_constraintTop_toBottomOf="@+id/editText_address"
+        android:background="@drawable/button_border"
+        android:layout_marginTop="16dp"
+        android:textSize="12sp"
+        android:textColor="@color/colorAccent"
+        android:text="Start Driving"
+        android:startVisibility="@{String.valueOf(pojo.userObjectId)}"
+        android:riderViewModel="@{viewModel}"
+
+        android:padding="12dp"
+android:onClick="@{()-> callListener.onCall(String.valueOf(pojo.userObjectId),pojo.latitude,pojo.longitude)}"
+        app:layout_constraintStart_toStartOf="@id/user_name"
+        app:layout_constraintEnd_toStartOf="@id/btn_disconnect"
+
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
+
+        />
+
+<!--        android:onClick="@{()->viewModel.startDriving(String.valueOf(pojo.userObjectId),pojo.latitude,pojo.longitude)}"
+-->
+
+    <Button
+        android:id="@+id/btn_disconnect"
+        app:layout_constraintTop_toBottomOf="@+id/editText_address"
+        android:background="@drawable/button_border"
+        android:layout_marginTop="16dp"
+        android:textSize="12sp"
+        android:textColor="@color/colorAccent"
+        android:text="Disconnect"
+        android:riderViewModel="@{viewModel}"
+        android:disConnectVisbility="@{String.valueOf(pojo.userObjectId)}"
+        android:onClick="@{()->callListener.onDisconnect(String.valueOf(pojo.userObjectId))}"
+        android:padding="12dp"
+        app:layout_constraintStart_toEndOf="@id/btn_start"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
+
+        />
+
+    <!--        android:onClick="@{()->viewModel.disConnect(String.valueOf(pojo.userObjectId))}"
+-->
+
+    <TextView
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@{String.valueOf(pojo.latitude)}"
+        android:id="@+id/user_latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <TextView
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@{String.valueOf(pojo.longitude)}"
+        android:id="@+id/user_longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
