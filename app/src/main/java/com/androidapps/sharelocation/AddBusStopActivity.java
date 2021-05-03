@@ -2,6 +2,7 @@ package com.androidapps.sharelocation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,28 +14,26 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.androidapps.sharelocation.BackgroundLocationUpdate.AddBusStopRecylerViewAdapter;
-
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class AddBusStopActivity extends AppCompatActivity implements View.OnClickListener {
-TextView addBusStop;
-HomePageViewModel viewModel;
-AddBusStopRecylerViewAdapter adapter;
-RecyclerView recyclerViewBusStop;
+    TextView addBusStop, addRoute;
+    HomePageViewModel viewModel;
+    AddBusRouteRecylerViewAdapter adapter;
+    RecyclerView recyclerViewBusStop;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
-
         viewModel = new ViewModelProvider(this).get(HomePageViewModel.class);
         setContentView(R.layout.activity_add_bus_stop);
 
-        Toolbar toolbar=(Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
         // Get a support ActionBar corresponding to this toolbar
@@ -48,53 +47,91 @@ RecyclerView recyclerViewBusStop;
 
         ab.setTitle("Add Your Stops");
 
-        addBusStop=findViewById(R.id.add_bus_stop);
 
-        addBusStop.setOnClickListener(this);
+        addRoute = findViewById(R.id.add_route);
 
-        recyclerViewBusStop=findViewById(R.id.recycler_view_bus_stop);
+        addRoute.setOnClickListener(this);
+
+
+        recyclerViewBusStop = findViewById(R.id.recycler_view_bus_route);
         recyclerViewBusStop.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewBusStop.setHasFixedSize(true);
 
-        viewModel.getAllSavedBusStops();
+        viewModel.getAllSavedBusRoute();
 
-        viewModel.getBusStopLive().observe(this, new Observer<List<StringToJsonSerialization>>() {
+        viewModel.getBusRouteLive().observe(this, new Observer<List<StringToJsonSerialization>>() {
             @Override
             public void onChanged(List<StringToJsonSerialization> stringToJsonSerializations) {
 
-               // Log.d("onChanged:bus", String.valueOf(stringToJsonSerializations.size()));
-                adapter = new AddBusStopRecylerViewAdapter(stringToJsonSerializations, AddBusStopActivity.this, viewModel);
-                recyclerViewBusStop.setAdapter(adapter);
+                if (stringToJsonSerializations != null && stringToJsonSerializations.size() > 0) {
+
+                    Log.d("onChanged:busRoute", String.valueOf(stringToJsonSerializations.size()));
+                    adapter = new AddBusRouteRecylerViewAdapter(R.layout.add_bus_route_list, viewModel, new OnClickCallListener() {
+                        @Override
+                        public void onCall(String userId, double latitide, double longitude) {
+
+                        }
+
+                        @Override
+                        public void onDisconnect(String userId) {
+
+                        }
+
+                        @Override
+                        public void onClickRouteName(StringToJsonSerialization routeDetails,int objectPosition) {
+
+                            Log.d("onClickRouteName:", routeDetails.getRouteName() + " " + routeDetails.getOrigin()+" "+objectPosition);
+                            viewModel.updateRouteDetail(routeDetails,objectPosition);
+
+
+                        }
+                    });
+                    adapter.setBusRouteList(stringToJsonSerializations);
+                    recyclerViewBusStop.setAdapter(adapter);
+                }
             }
         });
 
+
+      /*  viewModel.getLiveRoute().observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> polyStrings) {
+                Log.d( "onChanged:pol", String.valueOf(polyStrings));
+                viewModel.livepolyString.addAll(polyStrings);
+                Log.d( "onChanged:poly", String.valueOf(viewModel.livepolyString.size()));
+
+
+            }
+        });*/
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-       // viewModel.getAllSavedBusStops();
+        // viewModel.getAllSavedBusStops();
     }
 
     @Override
     public void onClick(View view) {
-        if(view.getId()==R.id.add_bus_stop){
+       /* if(view.getId()==R.id.add_bus_stop){
 
-/*
             Intent startAddPlacesActivity = new Intent(this, AddPlacesActivity.class);
 
             startAddPlacesActivity.putExtra("Title","Add Bus Stop");
 
-            startActivity(startAddPlacesActivity);*/
-
-
-            Intent startAddPlacesActivity = new Intent(this, DriverRouteMapActivity.class);
-
-          //  startAddPlacesActivity.putExtra("Title","Add Bus Stop");
-
             startActivity(startAddPlacesActivity);
-        }
 
+
+        }*/
+
+        if (view.getId() == R.id.add_route) {
+
+
+            Intent shareRouteActivity = new Intent(this, DriverRouteMapActivity.class);
+
+
+            startActivity(shareRouteActivity);
+        }
 
 
     }

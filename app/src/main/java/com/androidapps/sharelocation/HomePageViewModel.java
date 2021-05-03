@@ -13,6 +13,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.databinding.ObservableArrayList;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -36,14 +37,17 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import static android.content.Context.MODE_PRIVATE;
 
 public class HomePageViewModel extends ViewModel {
+
     MainRepository repository;
     Context mContext;
+
     public static MutableLiveData<Integer> notificationOnVisibility = new MutableLiveData<>();
     public static MutableLiveData<Integer> notificationOffVisibility = new MutableLiveData<>();
     GeofencingClient geofencingClient;
     ArrayList<Geofence> geofenceList;
     PendingIntent geofencePendingIntent;
     GoogleApiClient mGoogleApiClient;
+    public  static ObservableArrayList<String> livepolyString = new ObservableArrayList<>();
     @ViewModelInject
     public HomePageViewModel(MainRepository mainRepository, @ApplicationContext Context context) {
 
@@ -251,7 +255,7 @@ public class HomePageViewModel extends ViewModel {
     }
 
     public void subscribeForCircleNameLiveQuery() {
-        repository.subscribeForCircleNameLiveQuery();
+      repository.subscribeForCircleNameLiveQuery();
     }
 
 
@@ -399,16 +403,64 @@ public class HomePageViewModel extends ViewModel {
         else return false;
     }
 
-    public void getAllSavedBusStops() {
+    public void getAllSavedBusRoute() {
         Log.d( "getAllSavedBusStops:","called");
 
-        repository.getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+        repository.getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
     }
 
     public MutableLiveData<List<StringToJsonSerialization>> getBusStopLive() {
         return repository.getBusStopLive();
 
     }
+    public void setBusStopLive(List<StringToJsonSerialization> busStopLive) {
+       /* if(busStopLive.size()>0){
+
+           // if(repository.getStopList().size()>0)
+           // repository.getStopList().clear();
+           repository.getStopList().addAll(busStopLive);
+            Log.d("setBusStopLive: ", String.valueOf(repository.getStopList().size()));
+        }
+*/
+        repository.busStopList.addAll(busStopLive);
+
+         repository.getBusStopLive().setValue(busStopLive);
+
+    }
+
+
+
+    public void setBusStopList(List<StringToJsonSerialization> busStopLive) {
+
+
+            if (repository.getStopList().size() > 0)
+                repository.getStopList().clear();
+
+         if (busStopLive.size() > 0) {
+             repository.getStopList().addAll(busStopLive);
+
+         }
+        Log.d("setBusStopLive: ", String.valueOf(repository.getStopList().size()));
+
+    }
+
+
+    public void setExistingBusStopList(List<StringToJsonSerialization> busStopLive) {
+
+
+        if (repository.existingBusStopList.size() > 0)
+            repository.existingBusStopList.clear();
+
+     repository.existingBusStopList.addAll(busStopLive);
+
+     repository.addExistingBusStops();
+
+    }
+
+
+    public List<StringToJsonSerialization> getBusStopList(){
+        return  repository.getStopList();
+        }
 
     public void removeBusStopFromServer(String posionToRemove) {
         repository.removeBusStopFromServer(posionToRemove);
@@ -417,4 +469,89 @@ public class HomePageViewModel extends ViewModel {
     public void setNotificationForBusStop(boolean isOn, int positionToChange,String addressTitle,double selectedLatitude,double selectedLongitude,String driverId) {
         repository.setNotificationForBusStop(isOn,positionToChange,addressTitle,selectedLatitude,selectedLongitude,driverId);
     }
+
+    public void shareRouteMap(StringToJsonSerialization routeDetail) {
+
+       /* List<String> polyPoints
+        repository.shareRouteMap(polyPoints);*/
+
+        repository.shareRouteMap(routeDetail);
+    }
+
+    public void unShareRouteMap(StringToJsonSerialization routeDetail) {
+
+       /* List<String> polyPoints
+        repository.shareRouteMap(polyPoints);*/
+
+        repository.unShareRoute(routeDetail);
+    }
+
+
+    public void saveRoute(StringToJsonSerialization routeDetail) {
+
+        repository.saveRoute(routeDetail);
+    }
+
+    public LiveData<List<StringToJsonSerialization>> getBusRouteLive() {
+        return repository.getBusRouteLive();
+    }
+
+    public void removeBusRouteFromServer(StringToJsonSerialization roteDetail) {
+        Log.d ("removeBusRoute", String.valueOf(roteDetail));
+        repository.removeBusRouteFromServer(roteDetail);
+    }
+
+    public void updateRouteDetail(StringToJsonSerialization roteDetail,int objectPosition) {
+        Log.d ("update", String.valueOf(roteDetail));
+        repository.getUpdateRoute().setValue(roteDetail);
+        repository.objectPosition=objectPosition;
+
+
+        if(roteDetail.routeName!=null) {
+            Log.d ("updaterou", String.valueOf(roteDetail));
+           repository. getRoteDetail().setRouteName(roteDetail.routeName);
+            repository.getRoteDetail().setOrigin(roteDetail.getOrigin());
+            repository. getRoteDetail().setDestination(roteDetail.getDestination());
+            repository. getRoteDetail().setPolyPoints(roteDetail.getPolyPoints());
+            repository. getRoteDetail().setWayPoints(roteDetail.getWayPoints());
+
+        }
+        Intent startDriverRouteMap=new Intent(mContext,DriverRouteMapActivity.class);
+        startDriverRouteMap.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(startDriverRouteMap);
+     /*   startDriverRouteMap.putExtra("RouteName",roteDetail.getRouteName());
+        startDriverRouteMap.putExtra("Origin",roteDetail.getOrigin());
+        startDriverRouteMap.putExtra("Destination",roteDetail.getDestination());
+        startDriverRouteMap.putExtra("WayPoints",roteDetail.getRouteName());
+        startDriverRouteMap.putExtra("RouteName",roteDetail.getRouteName());
+        startDriverRouteMap.putExtra("RouteName",roteDetail.getRouteName());*/
+    }
+
+    public MutableLiveData<StringToJsonSerialization> getUpdateRouteDetail() {
+        return  repository.getUpdateRoute();
+    }
+
+    public void setUpdateRouteDetail(StringToJsonSerialization updateRouteDetail) {
+        repository.getUpdateRoute().setValue(updateRouteDetail);
+
+    }
+
+    public void updateRouteDetailInServer(StringToJsonSerialization routeDetail) {
+        repository.updateRouteDetailInServer(routeDetail);
+    }
+
+    public void getAllSavedBusStops() {
+        repository.getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+    }
+
+    public void addBusStop(String busStopTitle, double latitude, double longitude) {
+        repository.addBusStop(busStopTitle,latitude,longitude);
+    }
+
+  /*  public MutableLiveData<List<String>> getLiveRoute() {
+       // repository.getPolyString();
+      *//*  if(repository.getPolyStringLive().getValue()!=null)
+            livepolyString.addAll(repository.getPolyStringLive().getValue());*//*
+       // return repository.getPolyStringLive();
+    }*/
 }

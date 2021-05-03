@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.Group;
+import androidx.databinding.ObservableArrayList;
+import androidx.databinding.ObservableField;
 
 import com.parse.ParseUser;
 
@@ -26,8 +28,8 @@ import retrofit2.Response;
 public  class  BindingAdapter {
 
     //HomePageViewModel homePageViewModel;
-
-
+    public final ObservableField<String> firstName = new ObservableField<>();
+    static ObservableArrayList<String> livepolyString = new ObservableArrayList<>();
     @androidx.databinding.BindingAdapter("android:notification")
     public static void notificationVisibility(ImageView notification,boolean isUserDriver) {
 
@@ -39,7 +41,80 @@ public  class  BindingAdapter {
         }
     }
 
+    @androidx.databinding.BindingAdapter(value = {"android:liveRouteOnVisibility"})
+    public static void liveRouteOn(ImageView routeViewOn, StringToJsonSerialization routeDetail) {
 
+
+      if(routeDetail.isNotificationOn())
+          routeViewOn.setVisibility(View.VISIBLE);
+
+      else routeViewOn.setVisibility(View.GONE);
+       // homePageViewModel.getLiveRoute();
+
+       // Log.d("liveRouteOn: ", String.valueOf(homePageViewModel.livepolyString.size()));
+
+
+/*if(livepolyString.size()>0)
+    livepolyString.clear();
+
+if(homePageViewModel.getLiveRoute()!=null) {
+
+    livepolyString.addAll(homePageViewModel.getLiveRoute().getValue());
+    Log.d("liveRouteOn:", String.valueOf(livepolyString.get(0)));
+}*/
+
+
+      }
+
+
+
+
+
+   /* List<String> subscribedChannels = ParseInstallation.getCurrentInstallation().getList("channels");
+                                for (int j = 0; j < subscribedChannels.size(); j++) {
+
+                                    Log.d("subscribedChannel ", String.valueOf(subscribedChannels.get(j)));
+                                    String currentRoute = "BusRoute " + routeDetail.getRouteName() + " " + ParseUser.getCurrentUser().getObjectId();
+
+                                    //  String currentRoute = "BusRoute " + routeDetail.getRouteName() + " " + ParseUser.getCurrentUser().getObjectId();
+                                    if (currentRoute.equals(subscribedChannels.get(j))) {
+
+                                        Log.d("subscribed", "visible");
+                                        routeViewOn.setVisibility(View.VISIBLE);
+
+                                    }
+                                    else {
+                                        routeViewOn.setVisibility(View.GONE);
+                                    }
+                                }*/
+
+
+
+    @androidx.databinding.BindingAdapter("android:liveRouteOffVisibility")
+    public static void liveRouteOff(ImageView routeViewOff,StringToJsonSerialization routeDetail) {
+        if(routeDetail.isNotificationOn())
+            routeViewOff.setVisibility(View.GONE);
+
+        else routeViewOff.setVisibility(View.VISIBLE);
+  /*      List<String> subscribedChannels = ParseInstallation.getCurrentInstallation().getList("channels");
+        for (int j = 0; j < subscribedChannels.size(); j++) {
+
+            Log.d("subscribedChannel ", String.valueOf(subscribedChannels.get(j)));
+            String currentRoute = "BusRoute " + routeDetail.getRouteName() + " " + ParseUser.getCurrentUser().getObjectId();
+
+            //  String currentRoute = "BusRoute " + routeDetail.getRouteName() + " " + ParseUser.getCurrentUser().getObjectId();
+            if (currentRoute.equals(subscribedChannels.get(j))) {
+
+                Log.d("subscribed", "visible");
+                routeViewOff.setVisibility(View.GONE);
+
+            }
+            else {
+                routeViewOff.setVisibility(View.VISIBLE);
+            }
+        }*/
+
+    }
 
     @androidx.databinding.BindingAdapter("android:setNameVisibility")
     public static void setNameVisibility(Group view, String needToEdit) {

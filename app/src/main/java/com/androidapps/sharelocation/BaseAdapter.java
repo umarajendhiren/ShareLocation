@@ -20,7 +20,7 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyVie
         ViewModel viewModel = getViewmodel();
      // DriverListBottomSheetAdapter.OnPhoneCallClickInterface  onPhoneCallClickInterface=getOnPhoneCallInterface();
         OnClickCallListener onClickCallListener=getOnCallListener();
-        holder.bind(obj, viewModel,onClickCallListener);
+        holder.bind(obj, viewModel,onClickCallListener,position);
     }
 
     @Override
@@ -37,10 +37,13 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyVie
             this.binding = binding;
         }
 
-        public void bind(Object obj, ViewModel viewModel,OnClickCallListener callListener) {
+        public void bind(Object obj, ViewModel viewModel,OnClickCallListener callListener,int ObjectPosition) {
             binding.setVariable(BR.viewModel, viewModel );
             binding.setVariable(BR.pojo, obj);
+
             binding.setVariable(BR.callListener,callListener);
+            binding.setVariable(BR.Objectposition,ObjectPosition);
+
            // binding.setVariable(BR.)
             binding.executePendingBindings();
         }

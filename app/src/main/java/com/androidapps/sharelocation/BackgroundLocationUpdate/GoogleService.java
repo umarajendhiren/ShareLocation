@@ -28,6 +28,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.androidapps.sharelocation.R;
+import com.androidapps.sharelocation.Utilities;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -54,16 +55,20 @@ public class GoogleService extends Service {
     private Handler mHandler = new Handler();
     private Handler mHandlerLocation = new Handler();
     private Timer mTimer = null;
+    static String lasstKnownLongitude;
     private static Timer mTimerLocation = null;
     long notify_interval = 10000;
     private static final String CHANNEL_ID = "channel_01";
     Intent intent;
     SharedPreferences sharedPrfActivity;
     private NotificationManager mNotificationManager;
-List<Boolean> isWatchingList=new ArrayList<>();
+    List<Boolean> isWatchingList = new ArrayList<>();
+
+    static SharedPreferences sharedPref;
+    static String lastKnownLatitude;
 
     JSONArray circleMemberArray;
-     ArrayList<String> circleMembers=new ArrayList<>();
+    ArrayList<String> circleMembers = new ArrayList<>();
 
     public GoogleService() {
 
@@ -72,15 +77,16 @@ List<Boolean> isWatchingList=new ArrayList<>();
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if(intent!=null){
-        boolean startedFromNotification = intent.getBooleanExtra("isStartedFromNotification",
-                false);
+        if (intent != null) {
+            boolean startedFromNotification = intent.getBooleanExtra("isStartedFromNotification",
+                    false);
 
-        Log.d( "onStartCommand: ", String.valueOf(startedFromNotification));
-        if(startedFromNotification){
+            Log.d("onStartCommand: ", String.valueOf(startedFromNotification));
+            if (startedFromNotification) {
 
-            mNotificationManager.cancel(1);
-        }}
+                mNotificationManager.cancel(1);
+            }
+        }
         return START_STICKY;
     }
 
@@ -96,13 +102,15 @@ List<Boolean> isWatchingList=new ArrayList<>();
 
 
         //mTimerLocation = new Timer();
+        /*sharedPref   = getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
+
+        lastKnownLatitude = sharedPref.getString("com.androidapps.sharelocation.Latitude", "null");
+        lasstKnownLongitude = sharedPref.getString("com.androidapps.sharelocation.Longitude", "null");*/
         mTimer = new Timer();
         mTimer.schedule(new TimerTaskToGetLocation(), 5, notify_interval);
 
 
         intent = new Intent();
-
-
 
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -114,7 +122,7 @@ List<Boolean> isWatchingList=new ArrayList<>();
             // Create the channel for the notification
             NotificationChannel mChannel =
                     new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW);
-            mChannel.setSound(null,null);
+            mChannel.setSound(null, null);
             mChannel.setShowBadge(false);
 
             // Set the Notification Channel for the Notification Manager.
@@ -128,7 +136,7 @@ List<Boolean> isWatchingList=new ArrayList<>();
     }
 
 
-    public  void fn_getlocation() {
+    public void fn_getlocation() {
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         isGPSEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnable = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -141,8 +149,6 @@ List<Boolean> isWatchingList=new ArrayList<>();
         Log.d("InBackground", InBackground);
 
 
-
-
         SharedPreferences sharedPref = getSharedPreferences("UserActivity", Context.MODE_PRIVATE);
 
 
@@ -151,12 +157,7 @@ List<Boolean> isWatchingList=new ArrayList<>();
         Log.d("onSharedPreferencee", useractivity);
 
 
-
-
-
-
-
-       // if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         if (InBackground.equals("false")) {
 
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -220,14 +221,10 @@ List<Boolean> isWatchingList=new ArrayList<>();
                     }
 
                 }
-            }
-
-
-            else
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            } else if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                     (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) &&
                     (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            ){
+            ) {
 
                 setLocationPermission("ON");
                 Log.d("fn_getlocation: ", "foreground on,back on");
@@ -281,24 +278,22 @@ List<Boolean> isWatchingList=new ArrayList<>();
         }*/ //if {
 
 
-          else  if (InBackground.equals("true")) {
+        else if (InBackground.equals("true")) {
             //if app is in  background ask permission
             Log.d("appInBackground", "true");
             if /*(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||*/
-                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Log.d("appInBackground", "Ask Permission");
                 setLocationPermission("OFF");
                 sendLocationRequestNotification();
 
-            }
-            else if /*(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            } else if /*(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                     (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) &&*/
-                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                 Log.d("appInBackground", "have Permission");
                 setLocationPermission("ON");
-
 
 
                 if (useractivity.equals("STILL")) {
@@ -356,31 +351,26 @@ List<Boolean> isWatchingList=new ArrayList<>();
         }
 
 
-
-
-        }
-
+    }
 
 
     private void setLocationPermission(String locationPermission) {
 
-        Log.d( "location",locationPermission);
+        Log.d("location", locationPermission);
 
         SharedPreferences sharedPref = getSharedPreferences("LocationPermission", Context.MODE_PRIVATE);
-        String lastKnownLocationPermission= sharedPref.getString("com.androidapps.sharelocation.locationpermission", "null");
-        Log.d( "locationpermission",locationPermission);
-        Log.d( "lastKnownLocationPerm",lastKnownLocationPermission);
-        if(lastKnownLocationPermission.equals(locationPermission)){
+        String lastKnownLocationPermission = sharedPref.getString("com.androidapps.sharelocation.locationpermission", "null");
+        Log.d("locationpermission", locationPermission);
+        Log.d("lastKnownLocationPerm", lastKnownLocationPermission);
+        if (lastKnownLocationPermission.equals(locationPermission)) {
 
-            Log.d( "location","same dont update");
-        }
+            Log.d("location", "same dont update");
+        } else {
 
-        else{
-
-            Log.d( "location","update");
+            Log.d("location", "update");
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("com.androidapps.sharelocation.locationpermission", locationPermission);
-                        editor.apply();
+            editor.apply();
             updateLocationPermission(locationPermission);
 
 
@@ -419,10 +409,10 @@ List<Boolean> isWatchingList=new ArrayList<>();
         });*/
     }
 
-    public void updateLocationPermission(String changedPermission){
+    public void updateLocationPermission(String changedPermission) {
 
 
-        ParseQuery<ParseUser> parseQuery=ParseUser.getQuery();
+        ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
         parseQuery.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser object, ParseException e) {
@@ -474,20 +464,20 @@ List<Boolean> isWatchingList=new ArrayList<>();
 
     }*/
 
-        private class TimerTaskToGetLocation extends TimerTask {
-            @Override
-            public void run() {
+    private class TimerTaskToGetLocation extends TimerTask {
+        @Override
+        public void run() {
 
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
 
-                        SharedPreferences sharedPref = getSharedPreferences("UserActivity", Context.MODE_PRIVATE);
+                    SharedPreferences sharedPref = getSharedPreferences("UserActivity", Context.MODE_PRIVATE);
 
 
-                        String useractivity = sharedPref.getString("com.androidapps.sharelocation.useractivity", "null");
+                    String useractivity = sharedPref.getString("com.androidapps.sharelocation.useractivity", "null");
 
-                        Log.d("onSharedPreferencee", useractivity);
+                    Log.d("onSharedPreferencee", useractivity);
 
                      /*   if (useractivity.equals("STILL")) {
                             Log.d("onSharedPreferencee", "still");
@@ -497,17 +487,15 @@ List<Boolean> isWatchingList=new ArrayList<>();
                         }*/
 
 
+                    Log.d("onSharedPreferencee", "getting location");
 
+                    // isGroupMemberWatching();
+                    fn_getlocation();
+                }
+            });
 
-                        Log.d("onSharedPreferencee", "getting location");
-
-                       // isGroupMemberWatching();
-                        fn_getlocation();
-                    }
-                });
-
-            }
         }
+    }
 
     private class TimerTaskToUpdateLocation extends TimerTask {
         @Override
@@ -516,53 +504,55 @@ List<Boolean> isWatchingList=new ArrayList<>();
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("TimerUpdateLocation","called");
+                    Log.d("TimerUpdateLocation", "called");
 
                     fn_getlocation();
 
-                }});}}
+                }
+            });
+        }
+    }
 
 
-                    public void  isGroupMemberWatching(){
+    public void isGroupMemberWatching() {
 
-      ParseQuery<ParseObject>   circleNameQuery=new ParseQuery<ParseObject>("CircleName");
-      List<String> currentUserId = new ArrayList<>();
-      currentUserId.add(ParseUser.getCurrentUser().getObjectId());
-      circleNameQuery.whereContainedIn("circleMember", currentUserId);
-      circleNameQuery.findInBackground(new FindCallback<ParseObject>() {
-          @Override
-          public void done(List<ParseObject> circleNameObjects, ParseException e) {
-              if(e==null && circleNameObjects.size()>0){
-                  Log.d( "currentUserInCircle", String.valueOf(circleNameObjects.size()));
-                  circleMembers.clear();
-                  isWatchingList.clear();
-                  for (int i = 0; i < circleNameObjects.size(); i++) {
+        ParseQuery<ParseObject> circleNameQuery = new ParseQuery<ParseObject>("CircleName");
+        List<String> currentUserId = new ArrayList<>();
+        currentUserId.add(ParseUser.getCurrentUser().getObjectId());
+        circleNameQuery.whereContainedIn("circleMember", currentUserId);
+        circleNameQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> circleNameObjects, ParseException e) {
+                if (e == null && circleNameObjects.size() > 0) {
+                    Log.d("currentUserInCircle", String.valueOf(circleNameObjects.size()));
+                    circleMembers.clear();
+                    isWatchingList.clear();
+                    for (int i = 0; i < circleNameObjects.size(); i++) {
 
-                      circleMemberArray = circleNameObjects.get(i).getJSONArray("circleMember");
+                        circleMemberArray = circleNameObjects.get(i).getJSONArray("circleMember");
 
-                      for (int j = 0; j < circleMemberArray.length(); j++) {
-                          try {
-                              Log.d("done:circleMemberid", String.valueOf(circleMemberArray.get(j)));
+                        for (int j = 0; j < circleMemberArray.length(); j++) {
+                            try {
+                                Log.d("done:circleMemberid", String.valueOf(circleMemberArray.get(j)));
 
-                             if(!circleMembers.contains(String.valueOf(circleMemberArray.get(j)))) {
-                                 circleMembers.add(String.valueOf(circleMemberArray.get(j)));
+                                if (!circleMembers.contains(String.valueOf(circleMemberArray.get(j)))) {
+                                    circleMembers.add(String.valueOf(circleMemberArray.get(j)));
 
-                                 isSomeOneWatching(String.valueOf(circleMemberArray.get(j)));
-                              }
-                             else{
-                                 Log.d("done:already ",String.valueOf(circleMemberArray.get(j)));
-                             }
+                                    isSomeOneWatching(String.valueOf(circleMemberArray.get(j)));
+                                } else {
+                                    Log.d("done:already ", String.valueOf(circleMemberArray.get(j)));
+                                }
 
 
-                          } catch (JSONException jsonException) {
-                              jsonException.printStackTrace();
-                          }
-                      }
-                  }
-              }
-          }
-      });
-  }
+                            } catch (JSONException jsonException) {
+                                jsonException.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     private void isSomeOneWatching(String parseUserId) {
 
@@ -617,41 +607,42 @@ else{
     }
 
 
-    public void fn_update (Location location){
-            Log.d("fn_update", "called");
-            SharedPreferences sharedPref = getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
+    public void fn_update(Location location) {
+        Log.d("fn_update", "called");
 
 
-            String lastKnownLatitude = sharedPref.getString("com.androidapps.sharelocation.Latitude", "null");
-            String lasstKnownLongitude = sharedPref.getString("com.androidapps.sharelocation.Longitude", "null");
+        sharedPref = Utilities.getLastKnownLocationShared(this);
+        lastKnownLatitude = sharedPref.getString("com.androidapps.sharelocation.Latitude", "null");
+        lasstKnownLongitude = sharedPref.getString("com.androidapps.sharelocation.Longitude", "null");
 
-            if (lastKnownLatitude.equals("null") || lasstKnownLongitude.equals("null")) {
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("com.androidapps.sharelocation.Latitude", String.valueOf(location.getLatitude()));
-                editor.putString("com.androidapps.sharelocation.Longitude", String.valueOf(location.getLongitude()));
-                editor.apply();
-                return;
-            }
+        if (lastKnownLatitude.equals("null") || lasstKnownLongitude.equals("null")) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("com.androidapps.sharelocation.Latitude", String.valueOf(location.getLatitude()));
+            editor.putString("com.androidapps.sharelocation.Longitude", String.valueOf(location.getLongitude()));
+            editor.apply();
+            return;
+        }
 
-            double lastKnownlatitude = Double.parseDouble(lastKnownLatitude);
-            double lastKnownLongitude = Double.parseDouble(lasstKnownLongitude);
-            ParseGeoPoint lastknownGeoPoint = new ParseGeoPoint(lastKnownlatitude, lastKnownLongitude);
+        double lastKnownlatitude = Double.parseDouble(lastKnownLatitude);
+        double lastKnownLongitude = Double.parseDouble(lasstKnownLongitude);
+        ParseGeoPoint lastknownGeoPoint = new ParseGeoPoint(lastKnownlatitude, lastKnownLongitude);
 
-            ParseGeoPoint changedLatitude = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+        ParseGeoPoint changedLatitude = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
 
-            double distance = changedLatitude.distanceInMilesTo(lastknownGeoPoint);
-            Log.d("distance", String.valueOf(distance));
-            //0.1 mile 528 feet
-            if (changedLatitude.distanceInMilesTo(lastknownGeoPoint) > 0.01) {
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("com.androidapps.sharelocation.Latitude", String.valueOf(location.getLatitude()));
-                editor.putString("com.androidapps.sharelocation.Longitude", String.valueOf(location.getLongitude()));
-                editor.apply();
+        double distance = changedLatitude.distanceInMilesTo(lastknownGeoPoint);
+        Log.d("distance", String.valueOf(distance));
+        //0.1 mile 528 feet
+        if (changedLatitude.distanceInMilesTo(lastknownGeoPoint) > 0.01) {
+            Log.d("fn_updateedit", "called");
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("com.androidapps.sharelocation.Latitude", String.valueOf(location.getLatitude()));
+            editor.putString("com.androidapps.sharelocation.Longitude", String.valueOf(location.getLongitude()));
+            editor.apply();
 
-            } else {
-                Log.d("locationSame: ", "Dont Save  In Server!");
+        } else {
+            Log.d("locationSame: ", "Dont Save  In Server!");
 
-            }
+        }
 
     /*    Log.d("lastKnownLatitude ", lastKnownLatitude);
         Log.d("lasstKnownLongitude ", lasstKnownLongitude);
@@ -671,13 +662,13 @@ else{
 
 
         }*/
-        }
+    }
 
 
-        public static class MyLocationListener implements LocationListener {
+    public static class MyLocationListener implements LocationListener {
 
-            public void onLocationChanged(final Location loc) {
-                Log.i("Location changed", String.valueOf(loc));
+        public void onLocationChanged(final Location loc) {
+            Log.i("Location changed", String.valueOf(loc));
 
 
           /*  SharedPreferences sharedPref = getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
@@ -705,27 +696,27 @@ else{
 
             }*/
 
-            }
+        }
 
 
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
 
         }
 
-        private void ShowRequestPermissionRationale (String title, String message){
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+
+    }
+
+    private void ShowRequestPermissionRationale(String title, String message) {
 
 
 
@@ -735,12 +726,12 @@ else{
                         "Since background location access has not been granted, this app will not be able to discover beacons in the background.
                         Please go to Settings -> Applications -> Permissions and grant background location access to this app.*/
 
-            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setTitle(title)
-                    .setMessage(message)
-                    .setNeutralButton("Change", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(title)
+                .setMessage(message)
+                .setNeutralButton("Change", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
                        /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             //from version 29 we need to ask backround locaion access permission
 
@@ -749,16 +740,16 @@ else{
                                 ActivityCompat.requestPermissions(GoogleService.this, permission,requestCode);
                             }
                         }*/
-                        }
-                    })
+                    }
+                })
 
-                    .setCancelable(false)
-                    .create()
-                    .show();
-        }
+                .setCancelable(false)
+                .create()
+                .show();
+    }
 
 
-        private void sendLocationRequestNotification () {
+    private void sendLocationRequestNotification() {
        /* Intent intent = new Intent(this, MyService.class);
 
         CharSequence text = Utils.getLocationText(mLocation);
@@ -767,62 +758,62 @@ else{
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);*/
 
-            // The PendingIntent that leads to a call to onStartCommand() in this service.
-            PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+        // The PendingIntent that leads to a call to onStartCommand() in this service.
+        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Intent activity = new Intent(this, GoogleService.class);
-            activity.putExtra("isStartedFromNotification", true);
+        Intent activity = new Intent(this, GoogleService.class);
+        activity.putExtra("isStartedFromNotification", true);
 
-            // The PendingIntent to launch activity.
-            PendingIntent activityPendingIntent = PendingIntent.getService(this, 0,
-                    activity, 0);
+        // The PendingIntent to launch activity.
+        PendingIntent activityPendingIntent = PendingIntent.getService(this, 0,
+                activity, 0);
 
 
-            Intent intentSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intentSettings.setData(uri);
-            // Set the Activity to start in a new, empty task
+        Intent intentSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intentSettings.setData(uri);
+        // Set the Activity to start in a new, empty task
         /*intentSettings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 );*/
 // Create the PendingIntent
-            PendingIntent settingsPendingIntent = PendingIntent.getActivity(
-                    GoogleService.this, 0, intentSettings, PendingIntent.FLAG_UPDATE_CURRENT
-            );
+        PendingIntent settingsPendingIntent = PendingIntent.getActivity(
+                GoogleService.this, 0, intentSettings, PendingIntent.FLAG_UPDATE_CURRENT
+        );
 
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                    .addAction(R.drawable.ic_2222, getString(R.string.change),
-                            settingsPendingIntent)
-                    //.setTimeoutAfter(1000)
-                    .addAction(R.drawable.ic_2222, getString(R.string.close), activityPendingIntent)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .addAction(R.drawable.ic_2222, getString(R.string.change),
+                        settingsPendingIntent)
+                //.setTimeoutAfter(1000)
+                .addAction(R.drawable.ic_2222, getString(R.string.close), activityPendingIntent)
 
 
-                    /*    .addAction(R.id.change_name, "Change",
-                                servicePendingIntent)*/
-                    //.setContentText("ShareLocation only works correctly if it can access your location all the time /n To update please follow these steps:/n 1.In settings,go to ShareLocation /n 2.Tap into locations permissions /n 3.Select Allow all the time")
-                    .setContentTitle("Allow all the time in location permission")
-                    .setOngoing(true)
-                    .setPriority(Notification.PRIORITY_MIN)
-                    .setSmallIcon(R.drawable.ic_2222)
-                    .setContentIntent(settingsPendingIntent)
-                    .setAutoCancel(true)
-                    // .setTicker(text)
-                    .setWhen(System.currentTimeMillis())
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(getString(R.string.permission_notification)));
+                /*    .addAction(R.id.change_name, "Change",
+                            servicePendingIntent)*/
+                //.setContentText("ShareLocation only works correctly if it can access your location all the time /n To update please follow these steps:/n 1.In settings,go to ShareLocation /n 2.Tap into locations permissions /n 3.Select Allow all the time")
+                .setContentTitle("Allow all the time in location permission")
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_MIN)
+                .setSmallIcon(R.drawable.ic_2222)
+                .setContentIntent(settingsPendingIntent)
+                .setAutoCancel(true)
+                // .setTicker(text)
+                .setWhen(System.currentTimeMillis())
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(getString(R.string.permission_notification)));
 
 
-            // Set the Channel ID for Android O.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                builder.setChannelId(CHANNEL_ID); // Channel ID
-
-            }
-
-            mNotificationManager.notify(1, builder.build());
-
+        // Set the Channel ID for Android O.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(CHANNEL_ID); // Channel ID
 
         }
+
+        mNotificationManager.notify(1, builder.build());
+
+
+    }
 
 
 }

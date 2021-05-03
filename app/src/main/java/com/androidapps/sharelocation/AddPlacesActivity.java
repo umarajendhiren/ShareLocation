@@ -50,7 +50,7 @@ import static com.androidapps.sharelocation.MainViewModel.idlingResourceForTest;
 public class AddPlacesActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnFocusChangeListener, GoogleMap.OnCameraIdleListener, View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private static int LOCATION_PERMIISION = 789;
-    String lastKnownLongitude,lastKnownLatitude;
+    String lastKnownLongitude, lastKnownLatitude;
     SharedPreferences sharedPrefLocation;
 
 
@@ -64,7 +64,7 @@ public class AddPlacesActivity extends AppCompatActivity implements OnMapReadyCa
     LocationListener locationListener;
     private double selectedAddressLatitude;
     private double selectedAddressLongitude;
-Utilities utilities;
+    Utilities utilities;
 
     ActivityAddPlacesBinding viewBinding;
     private String address;
@@ -114,7 +114,7 @@ Utilities utilities;
 
 
             postionToChange = getIntent().getExtras().get("Position").toString();
-            Log.d( "postionToChange ",postionToChange);
+            Log.d("postionToChange ", postionToChange);
 
         }
 
@@ -122,8 +122,8 @@ Utilities utilities;
         if (getIntent().getExtras().get("PositionToUpdateBustop") != null) {
 
 
-            PositionToUpdateBustop= getIntent().getExtras().get("PositionToUpdateBustop").toString();
-            Log.d( "PositionToUpdateBustop ",PositionToUpdateBustop);
+            PositionToUpdateBustop = getIntent().getExtras().get("PositionToUpdateBustop").toString();
+            Log.d("PositionToUpdateBustop ", PositionToUpdateBustop);
 
         }
 
@@ -147,8 +147,7 @@ Utilities utilities;
         } else {
             viewBinding.editTextHome.setText(getIntent().getExtras().get("Title").toString());
         }
-/*
-        if (getIntent().getExtras().get("IsBusStop").toString().equals("true")) {
+/*        if (getIntent().getExtras().get("IsBusStop").toString().equals("true")) {
             viewBinding.save.setVisibility(View.GONE);
           //  mMap.getUiSettings().setScrollGesturesEnabled(false);
 
@@ -157,7 +156,7 @@ Utilities utilities;
            // mMap.getUiSettings().setScrollGesturesEnabled(true);
         }*/
 
-        utilities=new Utilities();
+        utilities = new Utilities();
         CheckLocationAccessPermission();
     }
 
@@ -172,23 +171,23 @@ Utilities utilities;
 
 
 
+/*if(getIntent().getExtras().get("IsBusStop")!=null) {
+
+    if (getIntent().getExtras().get("IsBusStop").toString().equals("true")) {
+        viewBinding.save.setVisibility(View.GONE);
+        mMap.getUiSettings().setScrollGesturesEnabled(false);
+
+    } else {
+        viewBinding.save.setVisibility(View.VISIBLE);
+        mMap.getUiSettings().setScrollGesturesEnabled(true);
+    }
 
 
-        if (getIntent().getExtras().get("IsBusStop").toString().equals("true")) {
-            viewBinding.save.setVisibility(View.GONE);
-              mMap.getUiSettings().setScrollGesturesEnabled(false);
-
-        } else {
-            viewBinding.save.setVisibility(View.VISIBLE);
-             mMap.getUiSettings().setScrollGesturesEnabled(true);
-        }
-
-
-
+}*/
 
         if (getIntent().getExtras().get("Latitude") != null && getIntent().getExtras().get("Longitude") != null) {
-            Log.d("onMapReady:lat ",getIntent().getExtras().get("Latitude").toString());
-            Log.d("onMapReady:lat ",getIntent().getExtras().get("Longitude").toString());
+            Log.d("onMapReady:lat ", getIntent().getExtras().get("Latitude").toString());
+            Log.d("onMapReady:lat ", getIntent().getExtras().get("Longitude").toString());
             LatLng latLng = new LatLng(selectedAddressLatitude, selectedAddressLongitude);
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
         } else {
@@ -196,9 +195,6 @@ Utilities utilities;
             location.setLongitude(Double.parseDouble(lastKnownLongitude));
             location.setLatitude(Double.parseDouble(lastKnownLatitude));
             UpdateMap(location);
-
-
-
 
 
         }
@@ -255,7 +251,7 @@ Utilities utilities;
 
             } else {
                 Log.d("already have: ", "permission");
-                boolean isServiceRunning = utilities.isMyServiceRunning(this,GoogleService.class);
+                boolean isServiceRunning = utilities.isMyServiceRunning(this, GoogleService.class);
 
                 if (isServiceRunning) {
                     Log.d("CheckLocation", "service already running");
@@ -280,7 +276,7 @@ Utilities utilities;
         if (requestCode == LOCATION_PERMIISION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("permission", "granted");
-                boolean isServiceRunning = utilities.isMyServiceRunning(this,GoogleService.class);
+                boolean isServiceRunning = utilities.isMyServiceRunning(this, GoogleService.class);
 
                 if (isServiceRunning) {
                     Log.d("CheckLocation", "service already running");
@@ -390,65 +386,87 @@ Utilities utilities;
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        finish();
+        //  viewModel.setUpdateRouteDetail(viewModel.getRouteDetail());
+
+
+
+       /*      new java.util.Timer().schedule(
+                                        new java.util.TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                // your code here
+
+                                                viewModel.setBusStopLive(viewModel.getStopList());
+                                                Log.d( "onBackPressed: ",viewModel.getRouteDetail().getRouteName());
+                                                Log.d( "onBackPressed: ", String.valueOf(viewModel.getStopList().size()));
+                                            }
+                                        },
+                                        3000
+                                );*/
+
+
+    }
+
+    @Override
     public void onClick(View view) {
         if (view.getId() == R.id.save) {
 
            /* Log.d( "onClick:posiUpdate",postionToChange);
             Log.d( "posiUpdatebustop",PositionToUpdateBustop);*/
 
-            Log.d( "onClick:posiUpdate",viewModel.abTitle.getValue());
-            Log.d( "onClick:latit", String.valueOf(selectedAddressLatitude));
-            Log.d( "onClick:longi", String.valueOf(selectedAddressLongitude));
+            Log.d("onClick:posiUpdate", viewModel.abTitle.getValue());
+            Log.d("onClick:latit", String.valueOf(selectedAddressLatitude));
+            Log.d("onClick:longi", String.valueOf(selectedAddressLongitude));
 
 
             if (view.getId() == R.id.save) {
                 String addressTitle = viewBinding.editTextHome.getText().toString();
-                
-                
 
-                if(addressTitle.isEmpty()) {
+
+                if (addressTitle.isEmpty()) {
 
                     Toast.makeText(this, "Please enter place name!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (postionToChange == null  && PositionToUpdateBustop==null  && !viewModel.abTitle.getValue().equals("Add Bus Stop") ) {
+                if (postionToChange == null && PositionToUpdateBustop == null && !viewModel.abTitle.getValue().equals("Add Bus Stop")) {
 
 
-                    Log.d("onClick: save",selectedAddressLatitude+"  "+selectedAddressLongitude);
+                    Log.d("onClick: save", selectedAddressLatitude + "  " + selectedAddressLongitude);
 
                     //to save  new address for circle
-                    viewModel.savePlaceInServer( addressTitle, selectedAddressLatitude, selectedAddressLongitude);
+                    viewModel.savePlaceInServer(addressTitle, selectedAddressLatitude, selectedAddressLongitude);
                     Intent intent = new Intent(this, HomaPageActivity.class);
                     startActivity(intent);
 
 
-                } else if(postionToChange != null && PositionToUpdateBustop==null )  {
+                } else if (postionToChange != null && PositionToUpdateBustop == null) {
 
                     //to save edited,already existing address for circle
-                    Log.d("onClick: saveee",selectedAddressLatitude+"  "+selectedAddressLongitude);
-                    viewModel.updateAddress( addressTitle, selectedAddressLatitude, selectedAddressLongitude, postionToChange);
+                    Log.d("onClick: saveee", selectedAddressLatitude + "  " + selectedAddressLongitude);
+                    viewModel.updateAddress(addressTitle, selectedAddressLatitude, selectedAddressLongitude, postionToChange);
                     Intent intent = new Intent(this, HomaPageActivity.class);
                     startActivity(intent);
 
 
-                }
-
-                else if(PositionToUpdateBustop==null  && viewModel.abTitle.getValue().equals("Add Bus Stop")){
+                } else if (PositionToUpdateBustop == null && viewModel.abTitle.getValue().equals("Add Bus Stop")) {
 
                     //add bus stop for driver
 
-                    Log.d("onClick: Add bus",selectedAddressLatitude+" "+selectedAddressLongitude);
+                    Log.d("onClick: Add bus", selectedAddressLatitude + " " + selectedAddressLongitude);
 
-                    viewModel.addBusStop( addressTitle, selectedAddressLatitude, selectedAddressLongitude);
+                    viewModel.addBusStop(addressTitle, selectedAddressLatitude, selectedAddressLongitude);
                     finish();
-                }
-                else if(postionToChange == null && PositionToUpdateBustop!=null){
+                } else if (postionToChange == null && PositionToUpdateBustop != null) {
 
                     //add bus stop for driver
 
-                    Log.d("onClick: Add","updatebusStop");
+                    Log.d("onClick: Add", "updatebusStop");
 
-                    viewModel.updateBusStopAddress( addressTitle, selectedAddressLatitude, selectedAddressLongitude, Integer.parseInt(PositionToUpdateBustop));
+                    viewModel.updateBusStopAddress(addressTitle, selectedAddressLatitude, selectedAddressLongitude, Integer.parseInt(PositionToUpdateBustop));
                     finish();
                 }
 
@@ -465,17 +483,16 @@ Utilities utilities;
        /* mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {*/
-                Log.i("centerLat", String.valueOf(mMap.getCameraPosition().target.latitude));
-                Log.i("centerLong", String.valueOf(mMap.getCameraPosition().target.longitude));
-                selectedAddressLatitude = mMap.getCameraPosition().target.latitude;
-                selectedAddressLongitude = mMap.getCameraPosition().target.longitude;
-                address = Utilities.getAddressFromLocation(getApplicationContext(), mMap.getCameraPosition().target.latitude, mMap.getCameraPosition().target.longitude);
+        Log.i("centerLat", String.valueOf(mMap.getCameraPosition().target.latitude));
+        Log.i("centerLong", String.valueOf(mMap.getCameraPosition().target.longitude));
+        selectedAddressLatitude = mMap.getCameraPosition().target.latitude;
+        selectedAddressLongitude = mMap.getCameraPosition().target.longitude;
+        address = Utilities.getAddressFromLocation(getApplicationContext(), mMap.getCameraPosition().target.latitude, mMap.getCameraPosition().target.longitude);
 
-                viewBinding.editTextAddress.setText(address);
-                if (idlingResourceForTest != null) {
-                    idlingResourceForTest.setIdleState(true);
-                }
-
+        viewBinding.editTextAddress.setText(address);
+        if (idlingResourceForTest != null) {
+            idlingResourceForTest.setIdleState(true);
+        }
 
 
     }

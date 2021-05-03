@@ -169,7 +169,7 @@ else if(disConnectOrCallRider.getValue().equals("DisConnect"))
 
     public void setDriverNotification(String driverId){
 
-        repository.getAllSavedBusStops(driverId);
+       // repository.getAllSavedBusStops(driverId);
 
         Intent busStopDialog=new Intent(context,SetBusStopNotificationActivity.class);
         busStopDialog.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -185,6 +185,26 @@ else if(disConnectOrCallRider.getValue().equals("DisConnect"))
 
 
 
+    }
+
+
+    public void driverRouteMap(String driverId){
+
+
+        Log.d( "driverRouteMap:",driverId);
+        Intent driverRoute=new Intent(context,DriverLiveRoute.class);
+        driverRoute.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        driverRoute.putExtra("DriverId",driverId);
+
+        context.startActivity(driverRoute);
+    }
+
+    public void getDriverLiveLocation(GoogleMap mMap, String driverId) {
+        repository.getDriverLiveRoute(mMap,driverId);
+    }
+
+    public void setRouteMapFalse() {
+        repository.isItRouteMap=false;
     }
 }
 

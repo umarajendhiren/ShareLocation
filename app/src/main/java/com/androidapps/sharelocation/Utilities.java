@@ -2,6 +2,7 @@ package com.androidapps.sharelocation;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.location.Address;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class Utilities {
     static String uniqueId;
     static WindowManager windowManager;
+    public static SharedPreferences sharedPrefLastKnownLocation;
 
     public static String getUniqueId() {
         uniqueId = UUID.randomUUID().toString();
@@ -147,5 +149,13 @@ public class Utilities {
             }
         }
         return false;
+    }
+
+    public static SharedPreferences getLastKnownLocationShared(Context context){
+
+        sharedPrefLastKnownLocation   = context.getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
+return sharedPrefLastKnownLocation;
+       /* lastKnownLatitude = sharedPref.getString("com.androidapps.sharelocation.Latitude", "null");
+        lasstKnownLongitude = sharedPref.getString("com.androidapps.sharelocation.Longitude", "null");*/
     }
 }

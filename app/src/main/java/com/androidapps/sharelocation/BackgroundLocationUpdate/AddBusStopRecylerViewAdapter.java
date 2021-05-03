@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,6 +52,31 @@ public class AddBusStopRecylerViewAdapter extends RecyclerView.Adapter<AddBusSto
         Log.d("onBindViewHolder: ", String.valueOf(placesList.get(position).getPlaceName()));
         Log.d("onBindViewHolder: ", String.valueOf(placesList.get(position).getGeoPoint().getLatitude()));
         Log.d("onBindViewHolder: ", String.valueOf(placesList.get(position).getGeoPoint().getLongitude()));
+        holder.tvPlaceName.setClickable(false);
+        if(position==0 ){
+           // holder.tvPlaceName.setClickable(false);
+            holder.close.setVisibility(View.GONE);
+            holder.arrow.setVisibility(View.VISIBLE);
+
+        }
+        else if(position==placesList.size()-1){
+            //holder.tvPlaceName.setClickable(false);
+            holder.close.setVisibility(View.GONE);
+            holder.arrow.setVisibility(View.GONE);
+
+        }
+       /* else if(position!=0 || position!=placesList.size()-1 ){
+            Log.d( "onBindViewHoldpos ", String.valueOf(position));
+            if(homePageViewModel.isUpdateAddress){
+                Log.d( "onBindViewHoldertr ","true");
+                holder.tvPlaceName.setClickable(true);
+            }
+            else if (!homePageViewModel.isUpdateAddress){
+                holder.tvPlaceName.setClickable(false);
+                Log.d( "onBindViewHoldertr ","false");
+            }
+        }*/
+
         holder.tvPlaceName.setText(placesList.get(position).getPlaceName());
 
         String.valueOf(placesList.get(position).getGeoPoint().getLatitude());
@@ -64,15 +88,15 @@ public class AddBusStopRecylerViewAdapter extends RecyclerView.Adapter<AddBusSto
         if (placesList.get(position).isNotificationOn()) {
            // homePageViewModel.AddToGeoFenceList(placesList.get(position).getPlaceName(), placesList.get(position).getGeoPoint().getLatitude(), placesList.get(position).getGeoPoint().getLongitude());
 
-            holder.notificationOn.setVisibility(View.VISIBLE);
-            holder.notificationOff.setVisibility(View.GONE);
+     /*       holder.notificationOn.setVisibility(View.VISIBLE);
+            holder.notificationOff.setVisibility(View.GONE);*/
 
 
         } else {
            // homePageViewModel.removeGeoFenceFromList(placesList.get(position).getPlaceName());
 
-            holder.notificationOn.setVisibility(View.GONE);
-            holder.notificationOff.setVisibility(View.VISIBLE);
+          /*  holder.notificationOn.setVisibility(View.GONE);
+            holder.notificationOff.setVisibility(View.VISIBLE);*/
         }
 
 
@@ -91,7 +115,7 @@ public class AddBusStopRecylerViewAdapter extends RecyclerView.Adapter<AddBusSto
     public class BusStopViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView tvPlaceName, latitude, longitude, positionToUpdate;
-        ImageView close;
+        ImageView close,arrow;
         ImageView notificationOn, notificationOff;
 
 
@@ -102,19 +126,22 @@ public class AddBusStopRecylerViewAdapter extends RecyclerView.Adapter<AddBusSto
             longitude = itemView.findViewById(R.id.longitude);
             positionToUpdate = itemView.findViewById(R.id.position);
             close = itemView.findViewById(R.id.button_close);
-            notificationOn = itemView.findViewById(R.id.button_notification_on);
-            notificationOff = itemView.findViewById(R.id.button_notification_off);
+            arrow=itemView.findViewById(R.id.arrow);
+            arrow.setVisibility(View.VISIBLE);
 
+         /*   notificationOn = itemView.findViewById(R.id.button_notification_on);
+            notificationOff = itemView.findViewById(R.id.button_notification_off);
+*/
 
             tvPlaceName.setOnClickListener(this);
             close.setOnClickListener(this);
-            notificationOn.setOnClickListener(this);
-            notificationOff.setOnClickListener(this);
+            /*notificationOn.setOnClickListener(this);
+            notificationOff.setOnClickListener(this);*/
 
 
             if(homePageViewModel.isUserDriver()){
-                notificationOn.setVisibility(View.GONE);
-                notificationOff.setVisibility(View.GONE);
+                /*notificationOn.setVisibility(View.GONE);
+                notificationOff.setVisibility(View.GONE);*/
                 close.setVisibility(View.VISIBLE);
                 tvPlaceName.setClickable(true);
 
@@ -163,7 +190,7 @@ public class AddBusStopRecylerViewAdapter extends RecyclerView.Adapter<AddBusSto
                // homePageViewModel.unsubscribeForChannal(tvPlaceName.getText().toString());
 
             }
-            if (view.getId() == R.id.button_notification_on) {
+         /*   if (view.getId() == R.id.button_notification_on) {
 
 
                 homePageViewModel.setNotificationForBusStop(false, Integer.parseInt(positionToUpdate.getText().toString()),placesList.get(Integer.parseInt(positionToUpdate.getText().toString())).getPlaceName(),placesList.get(Integer.parseInt(positionToUpdate.getText().toString())).getGeoPoint().getLatitude(),placesList.get(Integer.parseInt(positionToUpdate.getText().toString())).getGeoPoint().getLongitude(),placesList.get(Integer.parseInt(positionToUpdate.getText().toString())).getObjectId());
@@ -186,7 +213,7 @@ public class AddBusStopRecylerViewAdapter extends RecyclerView.Adapter<AddBusSto
 
                 Toast.makeText(context, "Notification turned on for " + placesList.get(Integer.parseInt(positionToUpdate.getText().toString())).getPlaceName(), Toast.LENGTH_LONG).show();
 
-            }
+            }*/
         }
     }
 

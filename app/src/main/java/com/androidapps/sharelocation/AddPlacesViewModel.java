@@ -4,6 +4,8 @@ import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
+
 
 public class AddPlacesViewModel extends ViewModel {
     public static MutableLiveData<String> abTitle = new MutableLiveData<>();
@@ -35,5 +37,39 @@ public class AddPlacesViewModel extends ViewModel {
 
     public void updateBusStopAddress(String addressTitle, double selectedAddressLatitude, double selectedAddressLongitude,int positionToUpdate) {
         mainRepository.updateBusStopAddress(addressTitle,selectedAddressLatitude,selectedAddressLongitude,positionToUpdate);
+    }
+
+   /* public void updateRouteDetail(StringToJsonSerialization roteDetail) {
+        Log.d ("update", String.valueOf(roteDetail));
+        mainRepository.getUpdateRoute().setValue(roteDetail);
+
+        if(roteDetail.routeName!=null) {
+            Log.d ("updaterou", String.valueOf(roteDetail));
+            mainRepository. getRoteDetail().setRouteName(roteDetail.routeName);
+            mainRepository.getRoteDetail().setOrigin(roteDetail.getOrigin());
+            mainRepository. getRoteDetail().setDestination(roteDetail.getDestination());
+            mainRepository. getRoteDetail().setPolyPoints(roteDetail.getPolyPoints());
+            mainRepository. getRoteDetail().setWayPoints(roteDetail.getWayPoints());
+
+        }}*/
+
+    public StringToJsonSerialization getRouteDetail() {
+        return  mainRepository.getRoteDetail();
+    }
+
+    public void setUpdateRouteDetail(StringToJsonSerialization updateRouteDetail) {
+        mainRepository.getUpdateRoute().setValue(updateRouteDetail);
+
+    }
+
+    public List<StringToJsonSerialization> getStopList() {
+        return  mainRepository.getStopList();
+    }
+    public void setBusStopLive(List<StringToJsonSerialization> busStopLive) {
+
+
+        mainRepository.busStopList.addAll(busStopLive);
+        mainRepository.getBusStopLive().postValue(busStopLive);
+
     }
 }

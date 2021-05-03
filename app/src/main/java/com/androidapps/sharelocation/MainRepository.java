@@ -8,17 +8,23 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,11 +43,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
@@ -69,10 +77,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -87,15 +103,37 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 //getRiderLocationLive().setValue(riderLocation);
 public class MainRepository {
+    public   static StringToJsonSerialization  roteDetail;
 
+    public StringToJsonSerialization  getRoteDetail(){
+        if(roteDetail==null)
+            return roteDetail=new StringToJsonSerialization();
+        else return roteDetail;
+    }
+
+    public   static List<StringToJsonSerialization>  stopList;
+
+    public List<StringToJsonSerialization> getStopList(){
+        if(stopList==null)
+            return stopList=new ArrayList<>();
+        else return stopList;
+    }
     public static MutableLiveData<Boolean> isValidInviteCode;
     public static MutableLiveData<ParseGeoPoint> lastKnownLocation;
     public static MutableLiveData<Boolean> isDriverAvailable;
     public static boolean isDriverMarkerAvailable = false;
-
+    int count = 0;
     public static MutableLiveData<String> distanceLive;
     public static String distance;
     public static MutableLiveData<Boolean> isNetworkCOnnected;
+    private List<LatLng> points = new ArrayList<>();
+    private List<LatLng> reFormedPoints = new ArrayList<>();
+    HashSet<LatLng> pointsSet = new HashSet<>();
+
+    HashMap<String, String> point;
+
+    final Handler handlerSetPosition = new Handler();
+
 
     public MutableLiveData<Boolean> isNetworkCOnnectedInstance() {
 
@@ -128,6 +166,22 @@ public class MainRepository {
         } else return distanceLive;
     }
 
+    public static int objectPosition;
+    public static MutableLiveData<StringToJsonSerialization> updateRoute;
+
+    public MutableLiveData<StringToJsonSerialization> getUpdateRoute() {
+
+
+        if (updateRoute == null) {
+
+            updateRoute = new MutableLiveData<>();
+
+            return updateRoute;
+        } else
+
+            return updateRoute;
+    }
+
     public MutableLiveData<Boolean> getIsDriverAvailable() {
 
         if (isDriverAvailable == null) {
@@ -144,6 +198,7 @@ public class MainRepository {
     public static MutableLiveData<String> driverCode;
     public static boolean isItriderMapFragment;
     public static boolean isItDriverMapFragment;
+    public static boolean isItRouteMap;
 
     public static MutableLiveData<ParseGeoPoint> riderLocationLive;
     boolean isMarkerAvailable = false;
@@ -278,6 +333,7 @@ public class MainRepository {
     ArrayList<String> riderList = new ArrayList<>();
 
     static MutableLiveData<String> selectedDriverId;
+
     public MutableLiveData<String> getSelectedDriverId() {
 
         if (selectedDriverId == null) {
@@ -288,9 +344,6 @@ public class MainRepository {
         return selectedDriverId;
 
     }
-
-
-
 
 
     public MutableLiveData<ArrayList<Marker>> getRiderMarkerInstance() {
@@ -346,7 +399,7 @@ public class MainRepository {
 
     public static MutableLiveData<List<StringToJsonSerialization>> BusStopLive;
 
-    public MutableLiveData<List<StringToJsonSerialization>> getBusStopLive() {
+    public  MutableLiveData<List<StringToJsonSerialization>> getBusStopLive() {
 
         if (BusStopLive == null) {
             BusStopLive = new MutableLiveData<>();
@@ -356,14 +409,29 @@ public class MainRepository {
         return BusStopLive;
     }
 
+    public static MutableLiveData<List<StringToJsonSerialization>> BusRouteLive;
 
+    public MutableLiveData<List<StringToJsonSerialization>> getBusRouteLive() {
+
+        if (BusRouteLive == null) {
+            BusRouteLive = new MutableLiveData<>();
+
+            return BusRouteLive;
+        }
+        return BusRouteLive;
+    }
+
+    static List<StringToJsonSerialization> busRouteList;
     public static MutableLiveData<Boolean> isHomeAvailable = new MutableLiveData<>();
     public static MutableLiveData<Boolean> isSchoolAvailable = new MutableLiveData<>();
     public static MutableLiveData<Boolean> isGroceryAvailable = new MutableLiveData<>();
     public static MutableLiveData<Boolean> isWorkAvailable = new MutableLiveData<>();
 
     List<StringToJsonSerialization> geofenceList;
-    List<StringToJsonSerialization> busStopList;
+    static List<StringToJsonSerialization> busStopList = new ArrayList<>();
+    public static List<StringToJsonSerialization> existingBusStopList = new ArrayList<>();
+
+
     List<StringToJsonSerialization> busStopgeofenceList;
     List<Geofence> busStopgeofenceListBuilder;
     static GoogleMap map;
@@ -374,6 +442,7 @@ public class MainRepository {
 
 
     static LatLngBounds.Builder builder;
+    static LatLng routeOrigin, routeDestination;
     static LatLngBounds bounds;
     int resizedMarkerwidth;
     int height;
@@ -386,6 +455,11 @@ public class MainRepository {
     Context mContext;
     LatLng updatedPosition;
     MarkerOptions markerOption;
+    static ArrayList<Marker> driverMarkerRoute;
+
+
+    static LatLng driverOrigin;
+    static LatLng driverDesstination;
     String userAddress;
     String currentLocationAddress;
     static List<UserDetailsPojo> userDetailsPojoList = new ArrayList<>();
@@ -495,6 +569,24 @@ public class MainRepository {
     ParseQuery<ParseObject> queryCircleName;
     ParseQuery<ParseUser> queryParseUser;
 
+    List<String> polyList;
+    static MutableLiveData<StringToJsonSerialization> polyStringLive;
+
+
+    public MutableLiveData<StringToJsonSerialization> getPolyStringLive() {
+
+
+        if (polyStringLive == null) {
+            return polyStringLive = new MutableLiveData<>();
+
+
+        } else return polyStringLive;
+    }
+
+    static GoogleMap routeMap;
+    static String driverIdForRouteMap;
+    static int pointId = 0;
+
     ParseLiveQueryClient parseLiveQueryClient;
     List<String> subscribedChannals;
     GeofencingClient geofencingClient;
@@ -503,6 +595,7 @@ public class MainRepository {
     static List<String> driverListArray = new ArrayList<>();
 
     public static Location currentUserLocation;
+    Runnable runnable;
 
     @Inject
     public MainRepository(@ApplicationContext Context context,
@@ -565,6 +658,69 @@ public class MainRepository {
 
 
                     public void run() {
+
+                        Log.d("isItRoute", String.valueOf(isItRouteMap));
+                        if (isItRouteMap && object.getObjectId().equals(driverIdForRouteMap) && routeMap != null && driverMarkerRoute.get(0) != null) {
+                            Log.d("run:updatesDriver", object.getObjectId());
+                            LatLng driverLocation = getLocationLatLong(object, "userCurrentLocation");
+
+
+                            userAddress = Utilities.getAddressFromLocation(mContext, driverLocation.latitude, driverLocation.longitude);
+
+
+                            driverDesstination = new LatLng(driverLocation.latitude, driverLocation.longitude);
+                            //   driverOrigin=new LatLng(driverMarkerRoute.get(0).getPosition().latitude,driverMarkerRoute.get(0).getPosition().longitude);
+
+                            if (driverOrigin.latitude == driverDesstination.latitude && driverOrigin.longitude == driverDesstination.longitude) {
+                                Log.d("done:same", "driverOrigin");
+
+                            } else {
+
+
+                                Log.d("done:origin", String.valueOf(driverOrigin));
+                                Log.d("done:des", String.valueOf(driverDesstination));
+                                Log.d("done:marker", String.valueOf(driverMarkerRoute.get(0).getPosition()));
+
+
+                                String snappedUrl = getSnappedLatLng(driverOrigin, driverDesstination);
+
+
+                                Log.d("snappedUrl:", snappedUrl);
+
+                                handlerSetPosition.removeCallbacks(runnable);
+
+                                DownloadTask downloadTask = new DownloadTask();
+
+                                // Start downloading json data from Google Directions API
+                                downloadTask.execute(snappedUrl);
+
+                                builder = new LatLngBounds.Builder();
+
+
+                                Log.d("onActivityResult", driverOrigin + " " + driverDesstination);
+
+                                builder.include(routeOrigin);
+                                builder.include(routeDestination);
+                                builder.include(driverOrigin);
+                                builder.include(driverDesstination);
+
+                                bounds = builder.build();
+
+                                width = mContext.getResources().getDisplayMetrics().widthPixels;
+                                height = mContext.getResources().getDisplayMetrics().heightPixels;
+                                padding = (int) (width * 0.10);
+
+                                cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                                routeMap.animateCamera(cu);
+
+
+                                driverOrigin = driverDesstination;
+
+
+                            }
+                            return;
+
+                        }
 
 
                         Log.d("riderInstance", getRiderMarkerInstance().toString());
@@ -753,6 +909,7 @@ public class MainRepository {
 
                                                             //get custom marker using parse file and marker layout
                                                             getCustomMarker(R.layout.custom_marker, imagebitmapUpdated);
+
 
                                                             //get resized marker after update dp
                                                             resizeMarker(updatedbitmap, 230, 230);
@@ -2975,35 +3132,76 @@ public class MainRepository {
         this.mContext = context;
         //  map = mMap;
 
+        Log.d("storeUserCurre ", "called");
+
         //store this location to let other group member know the location
         JSONArray myGioPointArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
 
-        try {
 
-            myGioPointArray.put(new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
-            jsonObject.put("userCurrentLocation", myGioPointArray);
-            ParseUser.getCurrentUser().put("geoPoints", jsonObject);
+        if (currentUserLocation != null && location.getLatitude() == currentUserLocation.getLatitude() && location.getLongitude() == currentUserLocation.getLongitude()) {
 
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d("storeUserCu ", "no need to save");
+            return;
         }
 
 
-        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+        queryParseUser.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
             @Override
-            public void done(ParseException e) {
+            public void done(ParseUser object, ParseException e) {
                 if (e == null) {
 
-                    Log.d("userCurrentLocation", "saved!!!");
-                    currentUserLocation = location;
-                } else {
+                    JSONObject gioPointsJsonObject = object.getJSONObject("geoPoints");
 
-                    Log.d("error ", e.getMessage());
+                    try {
+                        JSONArray locationArray = gioPointsJsonObject.getJSONArray("userCurrentLocation");
+
+
+                        JSONObject locationJsonObject = locationArray.getJSONObject(0);
+
+                        double latitude = (double) locationJsonObject.get("latitude");
+                        double longitude = (double) locationJsonObject.get("longitude");
+
+                        if (latitude == location.getLatitude() && longitude == location.getLongitude()) {
+
+                            Log.d("same ", "no need to save");
+                            currentUserLocation = location;
+
+                        } else {
+
+
+                            myGioPointArray.put(new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
+                            jsonObject.put("userCurrentLocation", myGioPointArray);
+                            ParseUser.getCurrentUser().put("geoPoints", jsonObject);
+
+
+                            ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e == null) {
+
+                                        Log.d("userCurrentLocation", "saved!!!");
+                                        currentUserLocation = location;
+                                    } else {
+
+                                        Log.d("error ", e.getMessage());
+                                    }
+                                }
+                            });
+                        }
+                    } catch (JSONException jsonException) {
+                        jsonException.printStackTrace();
+                    }
+
+
                 }
             }
         });
+
+
+
+
+
 
        /* ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
@@ -4972,7 +5170,6 @@ public class MainRepository {
                                 }
 
 
-
                                 StringToJsonSerialization serialization = new StringToJsonSerialization();
                                 serialization.setPlaceName(addressTitle);
                                 serialization.setGeoPoint(selectedAddressLatitude, selectedAddressLongitude);
@@ -5146,6 +5343,7 @@ public class MainRepository {
                                     ParsePush.subscribeInBackground(serialization.getPlaceName() + " " + circleNameLive.getValue() + " " + inviteCodeLive.getValue(), new SaveCallback() {
                                         @Override
                                         public void done(ParseException e) {
+
                                             Log.d("channel ", "subscribed to " + serialization.getPlaceName() + " " + circleNameLive.getValue() + " " + inviteCodeLive.getValue());
                                             // AddToGeoFenceList(serialization.getPlaceName() + " " + circleNameLive.getValue() + inviteCodeLive.getValue(), serialization.geoPoint.getLatitude(), serialization.geoPoint.getLongitude());
 
@@ -5936,11 +6134,11 @@ public class MainRepository {
 
     }
 
-    private void registerGeoFences() {
+    private void registerGeoFences(List<Geofence> geoFenceList) {
 
         // mGoogleApiClient == null  || !mGoogleApiClient.isConnected()
         geofencingClient = LocationServices.getGeofencingClient(mContext);
-        if (busStopList == null || busStopList.size() == 0) {
+        if (geoFenceList == null || geoFenceList.size() == 0) {
             Log.d("AddGeoFences: ", "return");
             return;
         }
@@ -7463,81 +7661,483 @@ public class MainRepository {
         });
     }
 
-    public void addBusStop(String addressTitle, double selectedAddressLatitude, double selectedAddressLongitude) {
-        busStopgeofenceList = new ArrayList<>();
-        queryParseUser.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+    public void addExistingBusStops() {
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser object, ParseException e) {
                 if (e == null) {
 
 
-                    StringToJsonSerialization serialization = new StringToJsonSerialization();
-                    serialization.setPlaceName(addressTitle);
-                    serialization.setGeoPoint(selectedAddressLatitude, selectedAddressLongitude);
+                    for (int i = 0; i < existingBusStopList.size(); i++) {
 
-                   // busStopgeofenceList.add(serialization);
+                        Log.d( "done:exis ", String.valueOf(existingBusStopList.size()));
+                        if (existingBusStopList.get(i).getPlaceName() != null) {
+                           /* for (String key : existingBusStopList.get(i).getWayPoints().keySet()) {
 
-                    //by default notification is OFF when first time added the place
+                                StringToJsonSerialization serialization = new StringToJsonSerialization();
+                                serialization.setPlaceName(key);
+                                serialization.setGeoPoint(existingBusStopList.get(i).getWayPoints().get(key).latitude, existingBusStopList.get(i).getWayPoints().get(key).longitude);
 
-                    Gson gson = new Gson();
-                    String json = gson.toJson(serialization);
+                                busStopList.add(serialization);
+                                Log.d( "onChanged:poin",key);*/
 
-                    JSONArray myBusStopArray = object.getJSONArray("BusStopArray");
-                    // myGioPointArray.put(json);
+                            Log.d("addressTitlent", "not null");
+                            StringToJsonSerialization serialization = new StringToJsonSerialization();
+                            serialization.setPlaceName(existingBusStopList.get(i).getPlaceName());
+                            serialization.setGeoPoint(existingBusStopList.get(i).getGeoPoint().getLatitude(), existingBusStopList.get(i).getGeoPoint().getLongitude());
 
+                            // busStopgeofenceList.add(serialization);
 
-                    JSONObject newJsonObject = new JSONObject();
-                    JSONArray newJsonArray = new JSONArray();
-                        /*String inviteCode = Utilities.getUniqueId();
-                        inviteCode = inviteCode.substring(0, 7);*/
+                            //by default notification is OFF when first time added the place
 
-
-                    if (myBusStopArray == null || myBusStopArray.length() == 0) {
-
-                        Log.d("circleNameJsonArray", "null");
-                        newJsonArray.put(json);
-                        object.put("BusStopArray", newJsonArray);
-                    } else if (myBusStopArray.length() > 0) {
-
-                        myBusStopArray.put(json);
-
-                        object.put("BusStopArray", myBusStopArray);
-                    }
+                            Gson gson = new Gson();
+                            String json = gson.toJson(serialization);
 
 
-                    object.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-
-                                Log.d("Bus stop Saved", String.valueOf(serialization.geoPoint));
-
-                                //after added bus stop add to geofence
-//if we add goefence only when add bus stop,it will removed from mobile if it switch off.so we need to add each time when we getAllBusStops()
-
-                               // buildGeoFence(busStopgeofenceList);
-
-                                getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+                            JSONArray myBusStopArray = object.getJSONArray("BusStopArray");
+                            // myGioPointArray.put(json);
 
 
+                            JSONObject newJsonObject = new JSONObject();
+                            JSONArray newJsonArray = new JSONArray();
+                            String inviteCode = Utilities.getUniqueId();
+                            inviteCode = inviteCode.substring(0, 7);
+
+                            if (myBusStopArray != null && myBusStopArray.length() > 0) {
+
+                                myBusStopArray.put(json);
+
+                                object.put("BusStopArray", myBusStopArray);
+                                object.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+
+                                            Log.d("Bus stop Saved", "aded");
+
+                                            //getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+
+
+                                        }
+                                    }
+                                });
+                            } else if (myBusStopArray == null || myBusStopArray.length() == 0) {
+
+
+                                newJsonArray.put(json);
+                                object.put("BusStopArray", newJsonArray);
+
+                                object.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+
+
+                                            Log.d("done:", "adde");
+                                         //   getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+
+                                        }
+                                    }
+                                });
                             }
                         }
-                    });
+
+
+                    }
+                }
+            }
+        });
+    }
+
+    public void addBusStop(String addressTitle, double selectedAddressLatitude, double selectedAddressLongitude) {
+
+
+
+
+
+
+
+
+        if(addressTitle!=null)
+        Log.d( "addBusStop:",addressTitle);
+        // busStopList.clear();
+      /*  StringToJsonSerialization serialization = new StringToJsonSerialization();
+        serialization.setPlaceName(addressTitle);
+        serialization.setGeoPoint(selectedAddressLatitude, selectedAddressLongitude);
+
+
+
+
+
+
+
+        // buildGeoFence(busStopList);
+        busStopList.add(serialization);
+        getBusStopLive().setValue(busStopList);
+        Log.d("done:busstopsize", String.valueOf(busStopList.size()));
+
+    }*/
+
+
+        // busStopgeofenceList = new ArrayList<>();
+        ParseQuery<ParseUser> query=ParseUser.getQuery();
+        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+
+
+                 /*   for(int i=0;i<existingBusStopList.size();i++){
+
+
+                        if (existingBusStopList.get(i).getPlaceName()!= null) {
+                           *//* for (String key : existingBusStopList.get(i).getWayPoints().keySet()) {
+
+                                StringToJsonSerialization serialization = new StringToJsonSerialization();
+                                serialization.setPlaceName(key);
+                                serialization.setGeoPoint(existingBusStopList.get(i).getWayPoints().get(key).latitude, existingBusStopList.get(i).getWayPoints().get(key).longitude);
+
+                                busStopList.add(serialization);
+                                Log.d( "onChanged:poin",key);*//*
+
+                            Log.d("addressTitlent", "not null");
+                            StringToJsonSerialization serialization = new StringToJsonSerialization();
+                            serialization.setPlaceName(existingBusStopList.get(i).getPlaceName());
+                            serialization.setGeoPoint(existingBusStopList.get(i).getGeoPoint().getLatitude(), existingBusStopList.get(i).getGeoPoint().getLongitude());
+
+                            // busStopgeofenceList.add(serialization);
+
+                            //by default notification is OFF when first time added the place
+
+                            Gson gson = new Gson();
+                            String json = gson.toJson(serialization);
+
+
+                            JSONArray myBusStopArray = object.getJSONArray("BusStopArray");
+                            // myGioPointArray.put(json);
+
+
+                            JSONObject newJsonObject = new JSONObject();
+                            JSONArray newJsonArray = new JSONArray();
+                            String inviteCode = Utilities.getUniqueId();
+                            inviteCode = inviteCode.substring(0, 7);
+
+                            if (myBusStopArray != null && myBusStopArray.length() > 0) {
+
+                                myBusStopArray.put(json);
+
+                                object.put("BusStopArray", myBusStopArray);
+                                object.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+
+                                            Log.d("Bus stop Saved", "aded");
+
+
+
+                                        }
+                                    }
+                                });
+                            }
+
+                            else  if (myBusStopArray == null || myBusStopArray.length() == 0) {
+
+
+                                newJsonArray.put(json);
+                                object.put("BusStopArray", newJsonArray);
+
+                                object.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+
+
+                                            Log.d( "done:","adde");
+
+
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+
+
+
+
+
+                    }*/
+
+
+if(addressTitle !=null) {
+
+    Log.d( "addressTitlent","not null");
+    StringToJsonSerialization serialization = new StringToJsonSerialization();
+    serialization.setPlaceName(addressTitle);
+    serialization.setGeoPoint(selectedAddressLatitude, selectedAddressLongitude);
+
+    // busStopgeofenceList.add(serialization);
+
+    //by default notification is OFF when first time added the place
+
+    Gson gson = new Gson();
+    String json = gson.toJson(serialization);
+
+
+    JSONArray myBusStopArray = object.getJSONArray("BusStopArray");
+    // myGioPointArray.put(json);
+
+
+    JSONObject newJsonObject = new JSONObject();
+    JSONArray newJsonArray = new JSONArray();
+    String inviteCode = Utilities.getUniqueId();
+    inviteCode = inviteCode.substring(0, 7);
+
+    if (myBusStopArray != null && myBusStopArray.length() > 0) {
+
+        myBusStopArray.put(json);
+
+        object.put("BusStopArray", myBusStopArray);
+        object.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+
+                    Log.d("Bus stop Saved", "sc");
+
+                    //after added bus stop add to geofence
+//if we add goefence only when add bus stop,it will removed from mobile if it switch off.so we need to add each time when we getAllBusStops()
+
+                    // buildGeoFence(busStopgeofenceList);
+
+                    getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+
+
+                }
+            }
+        });
+    }
+
+  else  if (myBusStopArray == null || myBusStopArray.length() == 0) {
+
+        Log.d("circleNameJsonArray", "null");
+        newJsonArray.put(json);
+        object.put("BusStopArray", newJsonArray);
+        object.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+
+                    Log.d("Bus stop Saved", "null");
+
+                    //after added bus stop add to geofence
+//if we add goefence only when add bus stop,it will removed from mobile if it switch off.so we need to add each time when we getAllBusStops()
+
+                    // buildGeoFence(busStopgeofenceList);
+
+                    getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+
+
                 }
             }
         });
     }
 
 
-    private void buildGeoFence(List<StringToJsonSerialization> geoFenceList) {
+
+}
+
+else if(addressTitle==null){
+    Log.d( "addressTitlent","null");
+    JSONArray newJsonArray = new JSONArray();
+    object.put("BusStopArray", newJsonArray);
+    Log.d("Bus stop Saved", "new");
+
+    object.saveInBackground(new SaveCallback() {
+        @Override
+        public void done(ParseException e) {
+            if (e == null) {
+
+                Log.d("Bus stop Saved", "scr");
+
+                //after added bus stop add to geofence
+//if we add goefence only when add bus stop,it will removed from mobile if it switch off.so we need to add each time when we getAllBusStops()
+
+                // buildGeoFence(busStopgeofenceList);
+
+                getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+
+
+            }
+        }
+    });
+
+}
+
+
+                }
+            }
+        });
+    }
+
+    private void buildGeoFence(StringToJsonSerialization geoFenceList) {
+
         busStopgeofenceListBuilder = new ArrayList<>();
+        //Log.d("buildGeoFence1", String.valueOf(geoFenceList.size()));
+        List<HashMap<String, LatLng>> busStopMap = new ArrayList<>();
+        String busStopName;
+
+        List<String> busStopKey = new ArrayList<>();
+        Set<String> busStopKeySet;
+
+      /*  if (geoFenceList.size() > 0) {
+            for (int i = 0; i < geoFenceList.size(); i++) {
+
+
+                if (geoFenceList.get(i).getWayPoints() != null) {
+                    Log.d("getWayPoints", String.valueOf(geoFenceList.get(i).getWayPoints()));
+                    busStopMap.add(geoFenceList.get(i).getWayPoints());
+                }
+
+            }*/
+
+        double originLatitude=geoFenceList.getOrigin().latitude;
+        double originLongitude=geoFenceList.getOrigin().longitude;
+        String originPlaceName=geoFenceList.getOriginPlaceName();
+
+
+        Log.d("buildGeoFence:ori",originPlaceName);
+
+
+       busStopgeofenceListBuilder.add(new Geofence.Builder()
+                // Set the request ID of the geofence. This is a string to identify this
+                // geofence.
+                .setRequestId("origin "+originPlaceName)
+
+                .setCircularRegion(
+                        originLatitude, originLongitude, 100
+                )
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                        Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build());
+
+        double destinationLatitude=geoFenceList.getDestination().latitude;
+        double destinationLongitude=geoFenceList.getDestination().longitude;
+        String destinationPlaceName=geoFenceList.getDestinationPlaceName();
+
+        Log.d("buildGeoFence:de",destinationPlaceName);
+
+        busStopgeofenceListBuilder.add(new Geofence.Builder()
+                // Set the request ID of the geofence. This is a string to identify this
+                // geofence.
+                .setRequestId("destination "+destinationPlaceName)
+
+                .setCircularRegion(
+                        destinationLatitude, destinationLongitude, 100
+                )
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                        Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build());
+
+        if (geoFenceList.getWayPoints() != null) {
+            busStopMap.add(geoFenceList.getWayPoints());
+
+            Log.d("buildGeoFence2", String.valueOf(busStopMap.size()));
+
+            for (int k = 0; k < busStopMap.size(); k++) {
+
+
+                busStopKeySet = busStopMap.get(k).keySet();
+
+                for (String key : busStopKeySet) {
+
+                    Log.d("busStopKeySet", key);
+
+                    busStopKey.add(key);
+
+                    busStopName = key;
+
+
+                    double latitude = busStopMap.get(k).get(key).latitude;
+                    double longitude = busStopMap.get(k).get(key).longitude;
+                   // busStopName = "BusRoute " + routeDetail.getRouteName() + " BusStop " + key + " " + latitude + " " + longitude;
+
+                   // Log.d("busStopName: ", "BusRoute " + geoFenceList.getRouteName() + " BusStop " + busStopName + " " + latitude + " " + longitude);
+
+                    busStopgeofenceListBuilder.add(new Geofence.Builder()
+                            // Set the request ID of the geofence. This is a string to identify this
+                            // geofence.
+                          //  .setRequestId("BusRoute " + geoFenceList.getRouteName() + " BusStop " + busStopName + " " + latitude + " " + longitude)
+                            .setRequestId("BusStop " + busStopName )
+
+                            .setCircularRegion(
+                                    latitude, longitude, 100
+                            )
+                            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                                    Geofence.GEOFENCE_TRANSITION_EXIT)
+                            .build());
+
+
+                }
+
+
+
+          /*  for (int j = 0; j < busStopKey.size(); j++) {
+                String busStopName = busStopKey.get(j);
+
+
+                double latitude = busStopMap.get(k).get(busStopKey.get(j)).latitude;
+                double longitude = busStopMap.get(k).get(busStopKey.get(j)).longitude;
+
+
+
+                Log.d("busStopName: ", busStopName + " " + latitude + " " + longitude);
+
+                busStopgeofenceListBuilder.add(new Geofence.Builder()
+                        // Set the request ID of the geofence. This is a string to identify this
+                        // geofence.
+                        .setRequestId("BusStop " + busStopName)
+
+                        .setCircularRegion(
+                                latitude, longitude, 100
+                        )
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                                Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .build());
+
+
+            }*/
+
+            }
+            if (busStopgeofenceListBuilder.size() > 0)
+                Log.d("buildGeoFencebuilder:", String.valueOf(busStopgeofenceListBuilder.size()));
+            registerGeoFences(busStopgeofenceListBuilder);
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+       /* busStopgeofenceListBuilder = new ArrayList<>();
         for (int i = 0; i < geoFenceList.size(); i++) {
 
 
             String requestKey = null;
 
             requestKey = geoFenceList.get(i).getPlaceName();
-
 
 
             double latitude = geoFenceList.get(i).getGeoPoint().getLatitude();
@@ -7559,23 +8159,104 @@ public class MainRepository {
 
 
             registerGeoFences();
+        }*/
+
+
+    public void getAllSavedBusRoute(String driverObjectId) {
+        busRouteList = new ArrayList<>();
+
+
+        if (getBusRouteLive().getValue() != null && getBusRouteLive().getValue().size() > 0) {
+
+            Log.d("busrouteLive", String.valueOf(getBusRouteLive().getValue().size()));
+
+
+            getBusRouteLive().getValue().clear();
+
         }
+        ParseQuery<ParseUser> queryObject = ParseUser.getQuery();
+
+        queryObject.getInBackground(driverObjectId, new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+
+
+                    int JsonArraySize = object.getJSONArray("routeDetails").length();
+
+                    Log.d("doneroute", String.valueOf(JsonArraySize));
+
+                    if (JsonArraySize == 0) {
+
+                        Log.d("done:get", "null");
+                        getBusRouteLive().setValue(null);
+
+                    } else if (JsonArraySize > 0) {
+
+                        for (int i = 0; i < JsonArraySize; i++) {
+
+                            Gson gson = new Gson();
+
+                            String busroute = null;
+
+                            try {
+
+
+                                busroute = String.valueOf(object.getJSONArray("routeDetails").get(i));
+
+
+                            } catch (JSONException ex) {
+                                ex.printStackTrace();
+                            }
+
+
+                            StringToJsonSerialization json = gson.fromJson(busroute, StringToJsonSerialization.class);
+
+
+                            StringToJsonSerialization serialization = new StringToJsonSerialization();
+                            serialization.setRouteName(json.getRouteName());
+                            serialization.setOrigin(json.getOrigin());
+                            serialization.setOriginPlaceName(json.getOriginPlaceName());
+                            serialization.setDestination(json.getDestination());
+                            serialization.setDestinationPlaceName(json.getDestinationPlaceName());
+                            serialization.setWayPoints(json.getWayPoints());
+                            serialization.setPolyPoints(json.getPolyPoints());
+                            serialization.setObjectId(object.getObjectId());
+                            Log.d("getroute: ", json.getRouteName());
+                            Log.d("getway: ", String.valueOf(json.getWayPoints()));
+
+                            busRouteList.add(serialization);
+
+
+                        }
+
+
+                         getBusRouteLive().setValue(busRouteList);
+                        getPolyString();
+                    }
+                }
+            }
+        });
+
+
     }
 
     public void getAllSavedBusStops(String objectId) {
-        busStopList = new ArrayList<>();
+
+        if(busStopList.size()>0)
+        busStopList.clear();
 
 
-        if(getBusStopLive().getValue() !=null && getBusStopLive().getValue().size()>0) {
+       /* if (getBusStopLive().getValue() != null && getBusStopLive().getValue().size() > 0) {
 
             Log.d("busStopLive", String.valueOf(getBusStopLive().getValue().size()));
 
             getBusStopLive().getValue().clear();
-        }
+        }*/
 
-          ParseQuery<ParseUser> queryObject = ParseUser.getQuery();
+        ParseQuery<ParseUser> queryObject = ParseUser.getQuery();
 
-        queryParseUser.getInBackground(objectId, new GetCallback<ParseUser>() {
+        queryObject.getInBackground(objectId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser object, ParseException e) {
                 if (e == null) {
@@ -7618,15 +8299,13 @@ public class MainRepository {
                             serialization.setObjectId(object.getObjectId());
 
 
-
-
-                            List<String> subscribedChannels = ParseInstallation.getCurrentInstallation().getList("channels");
+                         /*   List<String> subscribedChannels = ParseInstallation.getCurrentInstallation().getList("channels");
 
 
                             for (int j = 0; j < subscribedChannels.size(); j++) {
 
                                 Log.d("subscribedChannel ", String.valueOf(subscribedChannels.get(j)));
-                                String currentPlace = "BusStop "+json.getPlaceName() + " " +getSelectedDriverId().getValue();
+                                String currentPlace = "BusStop " + json.getPlaceName() + " " + getSelectedDriverId().getValue();
                                 if (currentPlace.equals(subscribedChannels.get(j))) {
 
                                     Log.d("setNotificationOn", json.getPlaceName() + " notification ON");
@@ -7634,34 +8313,43 @@ public class MainRepository {
                                 }
 
 
-                            }
+                            }*/
 
 
 
-
-
-
-
-
-                             Log.d("done:busstopsize", String.valueOf(busStopList.size()));
                             busStopList.add(serialization);
 
-                             buildGeoFence(busStopList);
+                            // buildGeoFence(busStopList);
 
 
                         }
+                      //  busStopList.addAll(existingBusStopList);
+                        Log.d("allbusstopsize", String.valueOf(busStopList.size()));
+
                         getBusStopLive().setValue(busStopList);
 
 
+                    }
                 }
             }
-        }});
+        });
     }
 
 
     public void updateBusStopAddress(String addressTitle, double selectedAddressLatitude,
                                      double selectedAddressLongitude, int postionToChange) {
-        //  ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("CircleName");
+
+      /*  Log.d( "updateBusStopAddress:", String.valueOf(postionToChange));
+        StringToJsonSerialization serialization = new StringToJsonSerialization();
+        serialization.setPlaceName(addressTitle);
+        serialization.setGeoPoint(selectedAddressLatitude, selectedAddressLongitude);
+
+
+        busStopList.set(postionToChange - 1, serialization);
+        getBusStopLive().setValue(busStopList);
+*/
+
+
 
         List<String> geofeceIdToUnregister = new ArrayList();
         queryParseUser.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
@@ -7686,7 +8374,7 @@ public class MainRepository {
                     Log.d("getGeoPoint: ", String.valueOf(json.getGeoPoint()));
 
 
-                    String geofenceId =  "BusStop " + json.getPlaceName();
+                  /*  String geofenceId = "BusStop " + json.getPlaceName();
 
 
                     //update address
@@ -7694,8 +8382,7 @@ public class MainRepository {
                     List<String> unRegisterGeofencIdeFromPhone = new ArrayList<>();
                     unRegisterGeofencIdeFromPhone.add(geofenceId);
 
-                    unRegisterGeoFences(unRegisterGeofencIdeFromPhone);
-
+                    unRegisterGeoFences(unRegisterGeofencIdeFromPhone);*/
 
 
                 } catch (JSONException ex) {
@@ -7729,7 +8416,7 @@ public class MainRepository {
                                 //after update place need to unregister old geo fence and register in new  geofence
 
 
-                               /* for (int i = 0; i < getBusStopLive().getValue().size(); i++) {
+                              /*  for (int i = 0; i < getBusStopLive().getValue().size(); i++) {
 
 
                                     String geofeceId = "BusStop " + getBusStopLive().getValue().get(i).getPlaceName();
@@ -7737,11 +8424,11 @@ public class MainRepository {
 
                                     geofeceIdToUnregister.add(geofeceId);
                                 }
-                                unRegisterGeoFences(geofeceIdToUnregister);*/
+                                unRegisterGeoFences(geofeceIdToUnregister);
+*/
 
-/*
 
-                                                List<String> subscribedChannels = ParseInstallation.getCurrentInstallation().getList("channels");
+                                            /*    List<String> subscribedChannels = ParseInstallation.getCurrentInstallation().getList("channels");
 
                                                 for (int j = 0; j < subscribedChannels.size(); j++) {
 
@@ -7758,8 +8445,8 @@ public class MainRepository {
 
                                                 }
 
-                                                getAllPlaceGeoPoints();
-*/
+                                                getAllPlaceGeoPoints();*/
+
 
                             } else {
                                 Log.d("done: ", e.getMessage());
@@ -7779,13 +8466,36 @@ public class MainRepository {
 
 
     public void removeBusStopFromServer(String positionToRemove) {
+        Log.d("busStopSize:", String.valueOf(busStopList.size()));
 
-        // ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("CircleName");
+      /*  Log.d("busStopSize:", String.valueOf(getStopList().size()));
+        if (getStopList().size() > 0) {
+            getStopList().remove(Integer.parseInt(positionToRemove)-1);
+            getBusStopLive().setValue(getStopList());
+
+        }
 
 
-        //  ParseQuery<ParseObject> queryObject = ParseQuery.getQuery("CircleName");
+    }
 
-        queryParseUser.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+      *//*  if (getBusStopLive().getValue().size() > 0) {
+
+            busStopList.remove(Integer.parseInt(positionToRemove) - 1);
+
+            getBusStopLive().setValue(busStopList);
+*//*
+         *//*  getStopList().clear();
+            getStopList().addAll(busStopList);*//*
+
+
+
+
+         */
+
+
+        ParseQuery<ParseUser> queryObject = ParseUser.getQuery();
+
+        queryObject.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser object, ParseException e) {
 
@@ -7805,56 +8515,59 @@ public class MainRepository {
 
                             Gson gson = new Gson();
                             String placeGeoJsonArray = null;
-                            try {
 
-                                placeGeoJsonArray = String.valueOf(object.getJSONArray("BusStopArray").get(Integer.parseInt(positionToRemove)));
-                                StringToJsonSerialization json = gson.fromJson(placeGeoJsonArray, StringToJsonSerialization.class);
+                            if (jsonArray.length() > 0) {
+                                try {
 
-                                Log.d("getPlaceName:toUpdate ", json.getPlaceName());
-                                Log.d("getGeoPoint: ", String.valueOf(json.getGeoPoint()));
+                                    placeGeoJsonArray = String.valueOf(object.getJSONArray("BusStopArray").get(Integer.parseInt(positionToRemove) - 1));
+                                    StringToJsonSerialization json = gson.fromJson(placeGeoJsonArray, StringToJsonSerialization.class);
 
-
-                                String geofenceId = "BusStop " + json.getPlaceName();
-
-
-                                //update address
-
-                                List<String> unRegisterGeofencIdeFromPhone = new ArrayList<>();
-                                unRegisterGeofencIdeFromPhone.add(geofenceId);
-
-                                unRegisterGeoFences(unRegisterGeofencIdeFromPhone);
-
-                            } catch (JSONException ex) {
-                                ex.printStackTrace();
-                            }
+                                    Log.d("getPlaceName:toUpdate ", json.getPlaceName());
+                                    Log.d("getGeoPoint: ", String.valueOf(json.getGeoPoint()));
 
 
+                                 /*   String geofenceId = "BusStop " + json.getPlaceName();
 
 
+                                    //update address
 
-                            Log.d("done:jsonBusStop", String.valueOf(jsonArray.length()));
-                            jsonArray.remove(Integer.parseInt(positionToRemove));
+                                    List<String> unRegisterGeofencIdeFromPhone = new ArrayList<>();
+                                    unRegisterGeofencIdeFromPhone.add(geofenceId);
 
-                            Log.d("done:jsonBusStop", String.valueOf(jsonArray.length()));
-                            object.put("BusStopArray", jsonArray);
+                                    unRegisterGeoFences(unRegisterGeofencIdeFromPhone);*/
 
-
-                            object.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if (e == null) {
-
-                                        Log.d("updates ", "Place removed!");
-                                        Log.d("updates ", String.valueOf(getBusStopLive().getValue().size()));
-
-                                        getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
-
-
-                                    }
+                                } catch (JSONException ex) {
+                                    ex.printStackTrace();
                                 }
-                            });
 
 
+                                Log.d("done:jsonBusStop", String.valueOf(jsonArray.length()));
+                                jsonArray.remove(Integer.parseInt(positionToRemove) - 1);
+
+                                Log.d("done:jsonBusStop", String.valueOf(jsonArray.length()));
+                                object.put("BusStopArray", jsonArray);
+
+
+                                object.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+
+                                            Log.d("updates ", "Place removed!");
+                                            Log.d("updates ", String.valueOf(getBusStopLive().getValue().size()));
+
+
+                                            getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+
+
+                                        }
+                                    }
+                                });
+
+                            } else {
+                                Log.d("done: em", "called");
+                                getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+                            }
                         }
                     } catch (NumberFormatException ex) {
                         ex.printStackTrace();
@@ -7864,8 +8577,8 @@ public class MainRepository {
 
             }
         });
-    }
 
+    }
 
     private void unRegisterGeoFences(List<String> GeoFenceIdToRemove) {
         geofencingClient = LocationServices.getGeofencingClient(mContext);
@@ -7879,7 +8592,7 @@ public class MainRepository {
             public void onSuccess(Void aVoid) {
                 Log.d("onSuccess: ", "unregistered");
 
-              //  getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
+                //  getAllSavedBusStops(ParseUser.getCurrentUser().getObjectId());
             }
         });
     }
@@ -7979,6 +8692,1079 @@ public class MainRepository {
 
 
     }
+
+    public void getDriverLiveRoute(GoogleMap mMap, String driverId) {
+
+
+        queryParseUser.getInBackground(driverId, new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+                    final Handler handler = new Handler();
+                    routeMap = mMap;
+                    isItRouteMap = true;
+                    driverIdForRouteMap = driverId;
+                    driverMarkerRoute = new ArrayList<>();
+                    LatLng driverLocation = getLocationLatLong(object, "userCurrentLocation");
+
+
+                    userAddress = Utilities.getAddressFromLocation(mContext, driverLocation.latitude, driverLocation.longitude);
+
+
+                    getCustomMarkerWithBus();
+
+                    resizeMarker(updatedbitmap, 215, 215);
+
+                    markerOption = new MarkerOptions().position(driverLocation).title(object.getUsername()).snippet(userAddress).icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
+
+
+                    markerNew = mMap.addMarker(markerOption);
+                    markerNew.setTag(object.getObjectId());
+
+                    driverMarkerRoute.add(markerNew);
+
+                    driverOrigin = new LatLng(driverLocation.latitude, driverLocation.longitude);
+
+                    // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(driverOrigin, 15));
+
+
+                    JSONArray route = object.getJSONArray("PolyLineString");
+                    List<LatLng> list = new ArrayList<>();
+                    List<LatLng> points = new ArrayList<>();
+
+                    if (route != null && route.length() > 0) {
+
+
+                        for (int i = 0; i < route.length(); i++) {
+                            try {
+                                list = DirectionsJSONParser.decodePoly(route.get(i).toString());
+
+                                points.addAll(list);
+
+                          /* for (int l = 0; l < list.size(); l++) {
+                               points.add(list.get(l));
+                           }*/
+                                Log.d("done:String", route.get(i).toString());
+                            } catch (JSONException jsonException) {
+                                jsonException.printStackTrace();
+                            }
+                        }
+                        Log.d("donltlnge:", String.valueOf(points.size()));
+
+
+                        builder = new LatLngBounds.Builder();
+
+
+                        routeOrigin = new LatLng(points.get(0).latitude, points.get(0).longitude);
+
+                        int lastIndex = points.size() - 1;
+                        routeDestination = new LatLng(points.get(lastIndex).latitude, points.get(lastIndex).longitude);
+                        Log.d("pointFirstAndLast", routeOrigin + " " + routeDestination + " " + lastIndex);
+
+//driver current location
+                        builder.include(driverOrigin);
+
+                        //driver route origin
+                        builder.include(routeOrigin);
+
+                        //driver route destination
+                        builder.include(routeDestination);
+
+                        bounds = builder.build();
+
+                        width = mContext.getResources().getDisplayMetrics().widthPixels;
+                        height = mContext.getResources().getDisplayMetrics().heightPixels;
+                        padding = (int) (width * 0.10);
+
+                        cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                        mMap.animateCamera(cu);
+
+
+                        PolylineOptions polylineOptions = new PolylineOptions();
+                        polylineOptions.addAll(points);
+                        polylineOptions.width(12);
+                        polylineOptions.color(Color.RED);
+                        polylineOptions.geodesic(true);
+
+                        mMap.addPolyline(polylineOptions);
+
+                    }
+
+
+                /*    if (count == 0) {
+
+                        getCustomMarkerWithBus();
+
+                        resizeMarker(updatedbitmap, 215, 215);
+
+                        markerOption = new MarkerOptions().position(driverLocation).title(object.getUsername()).snippet(userAddress).icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
+
+
+                        markerNew = mMap.addMarker(markerOption);
+                        markerNew.setTag(object.getObjectId());
+
+                        driverMarkerRoute.add(markerNew);
+
+                        driverOrigin = new LatLng(driverLocation.latitude, driverLocation.longitude);
+
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(driverOrigin, 15));
+
+
+
+                        count++;
+                        getDriverLiveRoute(mMap, driverId);
+
+                       *//* handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    count++;
+
+                                                    //post again
+                                                    Log.d("run:driverrout0", "calle");
+
+                                                    getDriverLiveRoute(mMap, driverId);
+                                                    handler.postDelayed(this, 10000);
+
+
+                                                }
+                                            }
+                                , 10000);*//*
+
+                    } else if (count > 0) {
+                      *//*  driverMarkerRoute.get(0).setSnippet(userAddress);
+                        driverMarkerRoute.get(0).setPosition(driverLocation);*//*
+                       // driverMarkerRoute
+                        driverDesstination = new LatLng(driverLocation.latitude, driverLocation.longitude);
+
+                        if (driverOrigin.latitude == driverDesstination.latitude  && driverOrigin.longitude==driverDesstination.longitude) {
+                            Log.d("done:same", "driverOrigin");
+
+
+                        *//*    handler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        count++;
+
+                                                        //post again
+                                                        Log.d("run:driverrout1", "calle");
+                                                        getDriverLiveRoute(mMap, driverId);
+
+                                                        handler.postDelayed(this, 10000);
+
+
+                                                    }
+                                                }
+                                    , 10000);
+*//*
+
+                        }
+                        else {
+
+
+                            Log.d("done:origin", String.valueOf(driverOrigin));
+                            Log.d("done:des", String.valueOf(driverDesstination));
+
+                            String snappedUrl = getSnappedLatLng(driverOrigin, driverDesstination);
+
+
+
+                            Log.d("snappedUrl:", snappedUrl);
+
+                            DownloadTask downloadTask = new DownloadTask();
+
+                            // Start downloading json data from Google Directions API
+                            downloadTask.execute(snappedUrl);
+
+                            builder = new LatLngBounds.Builder();
+
+
+                            Log.d("onActivityResult", driverOrigin + " " + driverDesstination);
+
+
+                            builder.include(driverOrigin);
+                            builder.include(driverDesstination);
+
+                            bounds = builder.build();
+
+                            width = mContext.getResources().getDisplayMetrics().widthPixels;
+                            height = mContext.getResources().getDisplayMetrics().heightPixels;
+                            padding = (int) (width * 0.20);
+
+                            cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+
+
+                            mMap.animateCamera(cu);
+
+               *//*             handler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        count++;
+                                                        driverOrigin = driverDesstination;
+                                                        //post again
+                                                        Log.d("run:driverrout", "calle");
+                                                        getDriverLiveRoute(mMap, driverId);
+
+                                                        handler.postDelayed(this, 10000);
+
+
+                                                    }
+                                                }
+                                    , 10000);
+
+*//*
+
+                        }*/
+
+                }
+
+
+            }
+        });
+    }
+
+
+    public String getSnappedLatLng(LatLng markerOrigin, LatLng markerDesti) {
+
+        String snappedUrl = "https://roads.googleapis.com/v1/snapToRoads?path=" + markerOrigin.latitude + "," + markerOrigin.longitude + "|" + markerDesti.latitude + "," + markerDesti.longitude + "&interpolate=true&key=AIzaSyCGKsTZuZgZm5fXxcOBwIh4Qg7MnTPYqyo";
+        return snappedUrl;
+        //https://roads.googleapis.com/v1/snapToRoads?path=-35.27801,149.12958|-35.28032,149.12907|-35.28099,149.12929|-35.28144,149.12984|-35.28194,149.13003|-35.28282,149.12956|-35.28302,149.12881|-35.28473,149.12836&interpolate=true&key=YOUR_API_KEY
+    }
+
+    public void shareRouteMap(StringToJsonSerialization routeDetail) {
+
+
+       // getPolyString();
+
+        Log.d( "shareRouteMap: ","called");
+
+        StringToJsonSerialization existingLiveRoute = getPolyStringLive().getValue();
+
+
+                if(existingLiveRoute!=null)
+                placeToUnregister(existingLiveRoute);
+
+                //get poly line first.
+
+                List<String> polylineOptions = routeDetail.getPolyPoints();
+
+                Log.d("shareRouteMap:", routeDetail.getRouteName());
+
+                ParseQuery<ParseUser> queryObject = ParseUser.getQuery();
+                queryObject.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+                    @Override
+                    public void done(ParseUser object, ParseException e) {
+
+                        if (e == null) {
+
+/*JSONArray polyString=new JSONArray();
+
+polyString.put(polylineOptions);*/
+
+
+                            object.put("PolyLineString", polylineOptions);
+                            object.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e == null) {
+                                        Toast.makeText(mContext, "Your Route Shared!", Toast.LENGTH_LONG).show();
+/*
+                                String currentRoute = "BusRoute " + routeDetail.getRouteName() + " " + ParseUser.getCurrentUser().getObjectId();
+
+
+                                ParsePush.subscribeInBackground(currentRoute, new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("subscribed", currentRoute);
+                                    }
+                                });*/
+
+
+                                        getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
+
+
+                                    } else if (e != null) {
+                                        Log.d("done:polyerror", e.getMessage());
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                });
+
+            }
+
+
+            public void unShareRoute(StringToJsonSerialization routeDetail){
+
+                Log.d("unShareRoute:","called");
+
+                StringToJsonSerialization existingLiveRoute = getPolyStringLive().getValue();
+
+                if(existingLiveRoute!=null)
+
+                    if(routeDetail.getPolyPoints().size()==existingLiveRoute.getPolyPoints().size()) {
+
+                        for (int i = 0; i < routeDetail.getPolyPoints().size(); i++) {
+
+                            if (routeDetail.getPolyPoints().get(i).equals(existingLiveRoute.getPolyPoints().get(i))) {
+                                if (i == routeDetail.getPolyPoints().size() - 1) {
+                                    Log.d("shareRouteMap:i", String.valueOf(i));
+
+
+                                    for (int j = 0; j < busRouteList.size(); j++) {
+
+                                        if (existingLiveRoute.getPolyPoints().size() == busRouteList.get(j).getPolyPoints().size()) {
+
+                                            existingLiveRoute.getPolyPoints().removeAll(busRouteList.get(j).getPolyPoints());
+
+                                            if (existingLiveRoute.getPolyPoints().size() == 0) {
+                                                Log.d("shareRouteMap:ii", String.valueOf(j));
+
+
+
+                                                if (busRouteList.get(j).isNotificationOn())
+                                                    busRouteList.get(j).setNotificationOn(false);
+
+                                                Toast.makeText(mContext, "", Toast.LENGTH_SHORT).show();
+                                                getBusRouteLive().setValue(busRouteList);
+                                                placeToUnregister(existingLiveRoute);
+
+
+
+
+
+
+
+                                                List<String> emptyStringList=new ArrayList<>();
+
+                                                //List<String> polylineOptions =emptyStringList;
+
+                                                Log.d("shareRouteMap:", routeDetail.getRouteName());
+
+                                                ParseQuery<ParseUser> queryObject = ParseUser.getQuery();
+                                                queryObject.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+                                                    @Override
+                                                    public void done(ParseUser object, ParseException e) {
+
+                                                        if (e == null) {
+
+/*JSONArray polyString=new JSONArray();
+
+polyString.put(polylineOptions);*/
+
+
+                                                            object.put("PolyLineString", emptyStringList);
+                                                            object.saveInBackground(new SaveCallback() {
+                                                                @Override
+                                                                public void done(ParseException e) {
+                                                                    if (e == null) {
+                                                                        Toast.makeText(mContext, "Your Route Deleted!", Toast.LENGTH_LONG).show();
+/*
+                                String currentRoute = "BusRoute " + routeDetail.getRouteName() + " " + ParseUser.getCurrentUser().getObjectId();
+
+
+                                ParsePush.subscribeInBackground(currentRoute, new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("subscribed", currentRoute);
+                                    }
+                                });*/
+
+                                                                        getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
+
+
+                                                                    } else if (e != null) {
+                                                                        Log.d("done:polyerror", e.getMessage());
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+
+                                                    }
+                                                });
+
+
+                                            }
+
+                                        }
+                                    }
+                                }
+
+
+                            }
+                        }
+                    }
+            }
+
+    public void saveRoute(StringToJsonSerialization routeDetail) {
+
+        queryParseUser.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+
+                    JSONArray routeArray = object.getJSONArray("routeDetails");
+
+
+                    //JSONObject jsonObject=new JSONObject();
+
+                    Gson gson = new Gson();
+                    String jsonrouteDetail = gson.toJson(routeDetail);
+
+
+                    //jsonObject.put(routeDetail.routeName,jsonrouteDetail);
+                    // jsonObject.put(jsonrouteDetail);
+
+                    if (routeArray == null) {
+                        Log.d("done:", "routcalled1");
+                        JSONArray jsonArray = new JSONArray();
+                        jsonArray.put(jsonrouteDetail);
+                        object.put("routeDetails", jsonArray);
+                        object.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    Toast.makeText(mContext, "Route saved!", Toast.LENGTH_LONG).show();
+
+
+
+//to remove tem bus stops
+                                    addBusStop(null,0.0,0.0);
+                                    busStopList.clear();
+                                    getBusStopLive().setValue(busStopList);
+                                    getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
+
+                                } else if (e != null) {
+                                    Log.d("error:", e.getMessage());
+                                    busStopList.clear();
+                                    getBusStopLive().setValue(busStopList);
+                                }
+                            }
+                        });
+                    } else {
+
+                        routeArray.put(jsonrouteDetail);
+                        Log.d("done:", "routecalled2");
+                        object.put("routeDetails", routeArray);
+                        object.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    Toast.makeText(mContext, "Route saved!", Toast.LENGTH_LONG).show();
+                                    getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
+                                    busStopList.clear();
+                                    getBusStopLive().setValue(busStopList);
+
+
+                                } else if (e != null) {
+                                    Log.d("error:", e.getMessage());
+                                    getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
+                                    busStopList.clear();
+                                    getBusStopLive().setValue(busStopList);
+
+                                }
+                            }
+                        });
+                    }
+
+
+                }
+            }
+        });
+
+
+    }
+
+    public void removeBusRouteFromServer(StringToJsonSerialization roteDetail) {
+
+        String routeName = roteDetail.getRouteName();
+        Log.d("removeRoute", routeName);
+
+        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+        userQuery.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+
+
+                    int JsonArraySize = object.getJSONArray("routeDetails").length();
+
+                    Log.d("doneroute", String.valueOf(JsonArraySize));
+
+                       /* if (JsonArraySize == 0) {
+
+                            Log.d("done:get", "null");
+                            getBusRouteLive().setValue(null);
+
+                        } else*/
+                    if (JsonArraySize > 0) {
+
+                        for (int i = 0; i < JsonArraySize; i++) {
+
+                            Gson gson = new Gson();
+
+                            String busroute = null;
+
+                            try {
+
+
+                                busroute = String.valueOf(object.getJSONArray("routeDetails").get(i));
+                                StringToJsonSerialization json = gson.fromJson(busroute, StringToJsonSerialization.class);
+
+
+                                if (json.getRouteName().equals(routeName)) {
+
+                                    Log.d("done:remobe", routeName);
+
+                                    placeToUnregister(json);
+/*
+                                List<String> unRegisterGeofencIdeFromPhone = new ArrayList<>();
+                                HashMap<String, LatLng> wayPoints = json.getWayPoints();
+
+                                String busStopName = null;
+
+                                for (String key : wayPoints.keySet()) {
+
+                                    Log.d("busStopKey", key);
+
+
+                                    double latitude = wayPoints.get(key).latitude;
+                                    double longitude = wayPoints.get(key).longitude;
+                                    busStopName = "BusRoute " + json.getRouteName() + key + " " + latitude + " " + longitude;
+
+                                    unRegisterGeofencIdeFromPhone.add(busStopName);
+                                    Log.d("busStopName: ", "BusRoute " + json.getRouteName() + key + " " + latitude + " " + longitude);
+                                }
+
+                                unRegisterGeoFences(unRegisterGeofencIdeFromPhone);*/
+
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+                                        JSONArray routeArray = object.getJSONArray("routeDetails");
+
+                                        routeArray.remove(i);
+
+                                        object.put("routeDetails", routeArray);
+                                        object.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                if (e == null) {
+
+                                                    Toast.makeText(mContext, routeName + " Route removed!", Toast.LENGTH_LONG).show();
+                                                    getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
+                                                }
+                                            }
+                                        });
+                                    }
+
+
+                                }
+
+                            } catch (JSONException ex) {
+                                ex.printStackTrace();
+                            }
+
+
+
+
+
+                             /*   StringToJsonSerialization serialization = new StringToJsonSerialization();
+                                serialization.setRouteName(json.getRouteName());
+                                serialization.setOrigin(json.getOrigin());
+                                serialization.setDestination(json.getDestination());
+                                serialization.setWayPoints(json.getWayPoints());
+                                serialization.setPolyPoints(json.getPolyPoints());
+                                serialization.setObjectId(object.getObjectId());
+                                Log.d("getroute: ", json.getRouteName());
+                                Log.d("getway: ", String.valueOf(json.getWayPoints()));*/
+
+
+                        }
+
+
+                    }
+                }
+            }
+        });
+    }
+
+    public void getPolyString() {
+
+
+        polyList = new ArrayList<>();
+
+        ParseQuery<ParseUser> parseQuery=ParseUser.getQuery();
+        parseQuery.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+
+                    JSONArray route = object.getJSONArray("PolyLineString");
+
+
+                    if (route != null && route.length() > 0) {
+
+                        for (int i = 0; i < route.length(); i++) {
+
+                            try {
+                                polyList.add(String.valueOf(route.get(i)));
+
+                            } catch (JSONException jsonException) {
+                                jsonException.printStackTrace();
+                            }
+
+
+                        }
+                        Log.d("done:polyList", String.valueOf(polyList.size()));
+                        // getPolyStringLive().setValue(polyList);
+                        for (int i = 0; i < busRouteList.size(); i++) {
+
+                            if (polyList.size() == busRouteList.get(i).getPolyPoints().size()) {
+
+                                polyList.removeAll(busRouteList.get(i).getPolyPoints());
+                                Log.d("done:afre", String.valueOf(polyList.size()));
+                                if (polyList.size() == 0) {
+
+
+
+                                    busRouteList.get(i).setNotificationOn(true);
+
+
+                                    buildGeoFence(busRouteList.get(i));
+                                    getPolyStringLive().setValue(busRouteList.get(i));
+
+                                } else {
+                                    busRouteList.get(i).setNotificationOn(false);
+                                }
+                            }
+                        }
+
+                        getBusRouteLive().setValue(busRouteList);
+                    }
+                }
+            }
+        });
+
+
+    }
+
+    public void updateRouteDetail(StringToJsonSerialization roteDetail) {
+
+
+    }
+
+    public void updateRouteDetailInServer(StringToJsonSerialization routeDetail) {
+
+//if shared route is updated,need to update polyString .
+
+
+        String routeName = routeDetail.getRouteName();
+
+        Log.d("updateRoute", routeName+" "+objectPosition);
+        //Log.d("updateRoute", String.valueOf(routeDetail.getWayPoints().size()));
+
+        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+        userQuery.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+
+
+                    int JsonArraySize = object.getJSONArray("routeDetails").length();
+
+                    Log.d("doneroute", String.valueOf(JsonArraySize));
+
+                       /* if (JsonArraySize == 0) {
+
+                            Log.d("done:get", "null");
+                            getBusRouteLive().setValue(null);
+
+                        } else*/
+                    if (JsonArraySize > 0) {
+
+                     //   for (int i = 0; i < JsonArraySize; i++) {
+
+                            Gson gson = new Gson();
+
+                            String busroute = null;
+
+                            try {
+
+
+                              //  busroute = String.valueOf(object.getJSONArray("routeDetails").get(i));
+                                busroute = String.valueOf(object.getJSONArray("routeDetails").get(objectPosition));
+                                StringToJsonSerialization json = gson.fromJson(busroute, StringToJsonSerialization.class);
+                                placeToUnregister(json);
+
+
+                             /*   if (json.getRouteName().equals(routeName)) {
+
+                                    Log.d("done:update", routeName);*/
+
+
+
+
+
+
+                               /* HashMap<String,LatLng> busStopsInSavedRoute=json.getWayPoints();
+
+                                for(String busStopName:busStopsInSavedRoute.keySet()){
+
+                                    StringToJsonSerialization serialization = new StringToJsonSerialization();
+                                    serialization.setPlaceName(busStopName);
+
+                                    serialization.setGeoPoint(busStopsInSavedRoute.get(busStopName).latitude, busStopsInSavedRoute.get(busStopName).longitude);
+
+                                    busStopList.add(serialization);
+                                }
+
+                                    getBusStopLive().setValue(busStopList);*/
+
+
+                                    String jsonrouteDetail = gson.toJson(routeDetail);
+
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+                                        JSONArray routeArray = object.getJSONArray("routeDetails");
+
+                                        routeArray.put(objectPosition, jsonrouteDetail);
+
+                                        object.put("routeDetails", routeArray);
+                                        object.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                if (e == null) {
+
+                                                    Toast.makeText(mContext, routeName + " Route Updated!", Toast.LENGTH_LONG).show();
+
+
+
+
+                                                    if(busRouteList.get(objectPosition).isNotificationOn()){
+
+                                                        shareRouteMap(routeDetail);
+                                                    }
+
+                                                    addBusStop(null,0.0,0.0);
+                                                    busStopList.clear();
+                                                    getBusStopLive().setValue(busStopList);
+                                                    getAllSavedBusRoute(ParseUser.getCurrentUser().getObjectId());
+                                                }
+
+                                                else if(e!=null){
+                                                    Log.e( "done:e",e.getMessage() );
+
+                                                }
+                                            }
+                                        });
+                                    }
+
+
+
+
+                            } catch (JSONException ex) {
+                                ex.printStackTrace();
+                            }
+
+                    }
+                }
+
+            }
+        });
+    }
+
+
+
+
+
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            String data = "";
+
+            try {
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+            Log.d("Background Task", "called1");
+
+            parserTask.execute(result);
+
+        }
+
+
+    }
+
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.connect();
+
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+
+
+                jObject = new JSONObject(jsonData[0]);
+                // DirectionsJSONParser parser = new DirectionsJSONParser();
+
+                //routes = parser.parse(jObject);
+
+                SnappedPointParser pointParser = new SnappedPointParser();
+                routes = pointParser.parseSnappedPoints(jObject);
+
+                Log.d("doInBackground:", "called");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.d("routSize", String.valueOf(routes));
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            Log.d("onPostExecute:", String.valueOf(result.size()));
+
+            for (int i = 0; i < result.size(); i++) {
+
+                lineOptions = new PolylineOptions();
+                points.clear();
+
+                List<HashMap<String, String>> path = result.get(i);
+
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                    // pointsSet.add(position);
+
+                    //  reFormedPoints.removeAll(points);
+
+
+                    Log.d("doInBackground:points", String.valueOf(points.size()));
+                    Log.d("doInBackground:pointSet", String.valueOf(reFormedPoints.size()));
+                    // Log.d("poly:", String.valueOf(position));
+
+                }
+                // pointsSet.addAll(points);
+
+                // reFormedPoints.addAll(pointsSet);
+
+
+                for (int j = 0; j < points.size(); j++) {
+
+                    Log.d("points at " + j, String.valueOf(points.get(j)));
+                    if (reFormedPoints.contains(points.get(j))) {
+
+                        Log.d("contains:", String.valueOf(points.get(j)));
+                    } else {
+                        Log.d(" not contains:", String.valueOf(points.get(j)));
+                        reFormedPoints.add(points.get(j));
+                    }
+                }
+
+               /* for (LatLng pointsSet : pointsSet) {
+                    Log.d( "pointsSet", String.valueOf(pointsSet));
+                    reFormedPoints.add(pointsSet);
+
+                }*/
+
+
+                for (int l = 0; l < reFormedPoints.size(); l++) {
+
+                    Log.d("new points at " + l, String.valueOf(reFormedPoints.get(l)));
+                }
+
+
+                lineOptions.addAll(points);
+                lineOptions.width(12);
+                lineOptions.color(Color.BLUE);
+                lineOptions.geodesic(true);
+                Log.d("doInBackground:", "called3");
+
+
+            }
+
+// Drawing polyline in the Google Map for the i-th route
+            Log.d("doInBackground:", "called4");
+            if (reFormedPoints.size() != 0 && routeMap != null) {
+                routeMap.addPolyline(lineOptions);
+
+                getSnappedRout(pointId);
+            }
+        }
+
+
+    }
+
+    public void getSnappedRout(int pointId) {
+
+
+        Log.d("pointId", String.valueOf(pointId));
+        Log.d("pointSize", String.valueOf(reFormedPoints.size()));
+        if (pointId < reFormedPoints.size() - 1) {
+            //driverMarkerRoute.get(0).setPosition(reFormedPoints.get(pointId));
+            Log.d("current:", String.valueOf(driverMarkerRoute.get(0).getPosition()));
+            LatLng toPosition = new LatLng(reFormedPoints.get(pointId + 1).latitude, reFormedPoints.get(pointId + 1).longitude);
+            // LatLng toPosition = new LatLng(points.get(points.size()-1).latitude, points.get(points.size()-1).longitude);
+            Log.d("toPosi:", String.valueOf(toPosition));
+            animateMarker(pointId, toPosition, driverMarkerRoute.get(0), false);
+
+
+        }
+    }
+
+
+    public void animateMarker(int startPositionId, final LatLng toPosition, Marker marker, final boolean hideMarke) {
+
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = routeMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 1000;
+
+        final Interpolator interpolator = new LinearInterpolator();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+
+
+                float t = interpolator.getInterpolation((float) elapsed
+                        / duration);
+
+                Log.d("run:t", String.valueOf(t));
+
+                double lng = t * toPosition.longitude + (1 - t)
+                        * startLatLng.longitude;
+                double lat = t * toPosition.latitude + (1 - t)
+                        * startLatLng.latitude;
+
+
+                Log.d("run:lat", String.valueOf(lat));
+                Log.d("run:lng", String.valueOf(lng));
+                marker.setPosition(new LatLng(lat, lng));
+                //  driverOrigin = new LatLng(lat,lng);
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    Log.d("run:", "called");
+
+                    handlerSetPosition.postDelayed(this, 8);
+
+
+                } else {
+                    if (hideMarke) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                        pointId = startPositionId + 1;
+                        getSnappedRout(pointId);
+
+
+                    }
+                }
+            }
+        };
+        handlerSetPosition.post(runnable);
+
+     /*   handler.post(new Runnable() {
+            @Override
+
+        });*/
+    }
+
+    public void placeToUnregister(StringToJsonSerialization routeDetail){
+
+        List<String> unRegisterGeofencIdeFromPhone = new ArrayList<>();
+
+
+        if(routeDetail.getWayPoints()!=null) {
+            HashMap<String, LatLng> wayPoints = routeDetail.getWayPoints();
+
+            String busStopName = null;
+
+            if (wayPoints != null && wayPoints.size() > 0) {
+
+                for (String key : wayPoints.keySet()) {
+
+                    Log.d("busStopKey", key);
+
+
+                    double latitude = wayPoints.get(key).latitude;
+                    double longitude = wayPoints.get(key).longitude;
+                  //  busStopName = "BusRoute " + routeDetail.getRouteName() + " BusStop " + key + " " + latitude + " " + longitude;
+                    busStopName = "BusStop " + key;
+
+                    unRegisterGeofencIdeFromPhone.add(busStopName);
+                    Log.d("busStopNameToUnreg: ", "BusRoute " + routeDetail.getRouteName() + " BusStop  " + key + " " + latitude + " " + longitude);
+                }
+            }
+        }
+
+        if(unRegisterGeofencIdeFromPhone.size()>0)
+        unRegisterGeoFences(unRegisterGeofencIdeFromPhone);
+    }
+
 }
 
 
@@ -8066,7 +9852,53 @@ public class MainRepository {
 
 
 
+/*import java.util.Arrays;
+import  java.util.*;
+public class Main
+{
+static int addedValue=0;
 
+
+   static List<Integer> requiredArray=new ArrayList<>();
+   static int[] requiredIntArray=new int[requiredArray.size()];
+
+    public static int[] twoSum(int[] nums, int target) {
+
+        for (int i=0;i<=nums.length-1;i++){
+
+           addedValue=addedValue+nums[i];
+               requiredIntArray[i]=nums[i];
+             //  requiredArray.add(nums[i]);
+             System.out.println(i);
+             System.out.println(addedValue);
+
+               if(addedValue==target)
+
+
+
+
+                   break;
+
+
+        }
+
+        requiredArray.toArray(requiredIntArray);
+      //return requiredArray.mapToInt(Integer::intValue).toArray();
+        return requiredIntArray;
+    }
+
+
+    public static void main(String[] args) {
+// TODO Auto-generated method stub
+int[] num = {2,7,1,6,11,15};
+        int target=9;
+        Main obj=new Main();
+      //  obj.twoSum(num,target);
+        System.out.println(Arrays.toString(obj.twoSum(num,target)));
+
+    }
+}
+*/
 
 
 

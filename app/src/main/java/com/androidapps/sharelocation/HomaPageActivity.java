@@ -321,7 +321,7 @@ networkConnectivityChangeBroadcastReceiver=new NetworkConnectivityChangeBroadcas
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        Log.d( "onSharedPreference ",s);
+        Log.d( "onShareeHomePage ",s);
         if(s.equals("com.androidapps.sharelocation.network")){
 
             String isConnected = sharedPrefConnectivity.getString("com.androidapps.sharelocation.network", "null");

@@ -347,6 +347,11 @@ public class DriverMapFragment extends Fragment implements View.OnClickListener,
 
                             }
                         }
+
+                        @Override
+                        public void onClickRouteName(StringToJsonSerialization routeDetails,int ObjectPosition) {
+
+                        }
                     });
                     mAdapter.setDriverList(userDetailsPojoList);
                     recyclerView.setAdapter(mAdapter);

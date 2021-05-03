@@ -72,6 +72,7 @@ public class PeopleFragment extends Fragment implements View.OnClickListener, On
     private GoogleMap mMap;
 
 
+
     private static final int LOCATION_PERMIISION = 789;
 
 
@@ -79,6 +80,8 @@ public class PeopleFragment extends Fragment implements View.OnClickListener, On
 
     private RecylerViewAdapter mAdapter;
     CircleNameDialogRecyclerView dialog;
+    static String lastChangedLatitude;
+    static String lastChangedLongitude;
 
     private HomePageViewModel homePageViewModel;
     private String SelectedMapType, preferenceCircleName, preferenceInviteCode;
@@ -90,11 +93,11 @@ public class PeopleFragment extends Fragment implements View.OnClickListener, On
     BottomSheetBehavior bottomSheet;
     private final List<String> preferenceValue = new ArrayList<>();
     FragmentPeopleBinding binding;
-    String lastKnownLatitude, lastKnownLongitude;
+   static String lastKnownLatitude, lastKnownLongitude;
     Utilities utilities;
 
     SharedPreferences sharedPrefSelectedCircle;
-    SharedPreferences sharedPrefLocation;
+    static SharedPreferences sharedPrefLocation;
     SharedPreferences sharedPrefLocationPermission;
     private boolean isInfoWindowShown;
     private PendingIntent mPendingIntent;
@@ -188,7 +191,6 @@ public class PeopleFragment extends Fragment implements View.OnClickListener, On
 
             }
         });
-
         /*need to change this*/
         AdView adView = new AdView(getActivity());
 
@@ -323,7 +325,8 @@ selectedCircleInviteCode.clear();
         });
 
 
-        sharedPrefLocation = getActivity().getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
+       // sharedPrefLocation = getActivity().getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
+        sharedPrefLocation=Utilities.getLastKnownLocationShared(getContext());
 
 
         lastKnownLatitude = sharedPrefLocation.getString("com.androidapps.sharelocation.Latitude", "null");
@@ -341,12 +344,16 @@ selectedCircleInviteCode.clear();
 
             location.setLatitude(Double.parseDouble(lastKnownLatitude));
 
+            lastChangedLatitude=lastKnownLatitude;
+
+
 
             //  String changedLongitude = sharedPrefLocation.getString("com.androidapps.sharelocation.Longitude", "null");
 
 
             Log.d("onChangedlongitfirs: ", lastKnownLongitude);
             location.setLongitude(Double.parseDouble(lastKnownLongitude));
+            lastChangedLongitude=lastKnownLongitude;
 
 
             // homePageViewModel.storeUserCurrentLocationInServer(getContext(), location, mMap);
@@ -435,7 +442,8 @@ if(mMap!=null) {
 
         sharedPrefLocationPermission = getActivity().getSharedPreferences("LocationPermission", Context.MODE_PRIVATE);
         sharedPrefLocationPermission.registerOnSharedPreferenceChangeListener(this);
-        //SharedPreferences sharedPref = getActivity().getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
+        /* sharedPrefLocation = getActivity().getSharedPreferences("LastKnownLocation", Context.MODE_PRIVATE);
+        sharedPrefLocation.registerOnSharedPreferenceChangeListener(this);*/
 
 
         /*lastKnownLatitude = sharedPrefLocation.getString("com.androidapps.sharelocation.Latitude", "null");
@@ -795,6 +803,7 @@ if(mMap!=null) {
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         // Update the buttons state depending on whether location updates are being requested.
+
         Log.d("onSharedChanged: ", s);
 
    /*     if (s.equals("com.androidapps.sharelocation.inviteCode")|| s.equals("com.androidapps.sharelocation.defaultCircleName")) {
@@ -854,11 +863,12 @@ if(mMap!=null) {
         homePageViewModel.subscribeForCircleNameLiveQuery();*/
         SharedPreferences.Editor editor = sharedPrefLocation.edit();
         Location location = new Location("sharedpreference");
-        if (s.equals("com.androidapps.sharelocation.Latitude")) {
+        if (s.equals("com.androidapps.sharelocation.Longitude")) {
 
             String changedLatitude = sharedPrefLocation.getString("com.androidapps.sharelocation.Latitude", "null");
 
             Log.d("onChangedlatitude: ", changedLatitude);
+            Log.d("lastChangedlatitude: ", lastChangedLatitude);
 
 
             location.setLatitude(Double.parseDouble(changedLatitude));
@@ -868,14 +878,41 @@ if(mMap!=null) {
 
 
             Log.d("onChangedlongitude: ", changedLongitude);
+            Log.d("lastChangedlongitude: ", lastChangedLongitude);
             location.setLongitude(Double.parseDouble(changedLongitude));
 
 
+            if(changedLatitude.equals(lastChangedLatitude) || changedLongitude.equals(lastChangedLongitude)) {
+                Log.d( "same ","called");
+            }
+            else{
+                Log.d( "save: ","called");
+                lastChangedLatitude=changedLatitude;
+                lastChangedLongitude=changedLongitude;
+
+                homePageViewModel.storeUserCurrentLocationInServer(getContext(), location, mMap);
+            }
+         /*   homePageViewModel.storeUserCurrentLocationInServer(getContext(), location, mMap);
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            // your code here
+                            Log.d("run:smshd ", "waiting for server");
+
+
+                        }
+                    },
+                    2000
+            );
+*/
+
             // homePageViewModel.storeUserCurrentLocationInServer(getContext(), location, mMap);
-            homePageViewModel.storeUserCurrentLocationInServer(getContext(), location, mMap);
 
 
-        } else if (s.equals("com.androidapps.sharelocation.locationpermission")) {
+
+        }
+        else if (s.equals("com.androidapps.sharelocation.locationpermission")) {
 
             //set location permission
 

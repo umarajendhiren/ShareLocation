@@ -25,19 +25,22 @@
 
         app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
 
+
+
+
+
     <TextView
-        android:id="@+id/add_bus_stop"
+        android:id="@+id/add_route"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="32dp"
-        android:text="Add Bus Stop"
+        android:text="Add Your Route"
         android:textColor="@color/colorAccent"
-        app:layout_constraintBottom_toTopOf="@id/recycler_view_bus_stop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_tip" />
-
+        app:layout_constraintTop_toBottomOf="@id/tv_tip"
+       app:layout_constraintStart_toStartOf="parent"
+        />
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_bus_stop"
+        android:id="@+id/recycler_view_bus_route"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="16dp"
@@ -45,7 +48,7 @@
 
         app:layout_constraintStart_toStartOf="parent"
 
-        app:layout_constraintTop_toBottomOf="@id/add_bus_stop"
+        app:layout_constraintTop_toBottomOf="@id/add_route"
 
 
         />
