@@ -71,10 +71,10 @@
 
     <data>
 
-        <import type="com.androidapps.sharelocation.MainActivity" />
+        <import type="com.androidapps.sharelocation.view.MainActivity" />
 
         <variable
             name="viewModel"
-            type="com.androidapps.sharelocation.MainViewModel" />
+            type="com.androidapps.sharelocation.viewmodel.MainViewModel" />
     </data>
 </layout>

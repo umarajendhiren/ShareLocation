@@ -1,7 +1,10 @@
 package com.androidapps.sharelocation;
 
+import android.content.Context;
 import android.os.Build;
 
+import com.androidapps.sharelocation.repository.MainRepository;
+import com.androidapps.sharelocation.viewmodel.MainViewModel;
 import com.parse.Parse;
 import com.parse.ParseUser;
 
@@ -26,17 +29,20 @@ import static org.mockito.Mockito.spy;
 import static org.robolectric.annotation.LooperMode.Mode.PAUSED;
 /*we must annotate any UI test that uses Hilt with @HiltAndroidTest.
 This annotation is responsible for generating the Hilt components for each test.*/
-
+/*Hilt only supports Robolectric tests and instrumentation tests because with constructor injection, it’s easy to implement unit tests without Dagger.*/
 
 @HiltAndroidTest
 
 //RobolectricTestRunner ,we can run the test that depends on the android framework without emulator or real device.
 //execution time  is faster in this runner.
+
 @RunWith(RobolectricTestRunner.class)
 @LooperMode(PAUSED)
 @Config(sdk = {Build.VERSION_CODES.O_MR1}, application = HiltTestApplication.class)
 public class HiltMainViewModelTest {
 
+
+    Context context;
 
     MainViewModel mainViewModel;
     @Inject
@@ -70,7 +76,7 @@ public class HiltMainViewModelTest {
 
         hiltRule.inject();
 
-        mainViewModel = new MainViewModel(mainRepository);
+      //  mainViewModel = new MainViewModel(mainRepository,context);
         // ActivityScenario activityScenario = ActivityScenario.launch(MainActivity.class);
 
     }

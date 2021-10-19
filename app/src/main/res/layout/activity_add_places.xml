@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddPlacesActivity"
+    tools:context=".view.AddPlacesActivity"
     android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar

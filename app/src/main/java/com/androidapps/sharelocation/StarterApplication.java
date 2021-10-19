@@ -26,6 +26,7 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 
 import dagger.hilt.android.HiltAndroidApp;
+
 //Kicks off Hilt code generation.
 @HiltAndroidApp
 public class StarterApplication extends Application implements LifecycleObserver {
@@ -184,5 +185,7 @@ public class StarterApplication extends Application implements LifecycleObserver
     SharedPreferences.Editor editor=isInBackground.edit();
     editor.putString("Background","false");
     editor.apply();
+
+
   }
 }

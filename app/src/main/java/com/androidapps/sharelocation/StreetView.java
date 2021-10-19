@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.androidapps.sharelocation.view.HomaPageActivity;
 import com.google.android.gms.maps.StreetViewPanoramaOptions;
 import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -17,7 +18,7 @@ public class StreetView extends AppCompatActivity {
 String userName;
     @Override
     public void onBackPressed() {
-        Intent intent=new Intent(this,HomaPageActivity.class);
+        Intent intent=new Intent(this, HomaPageActivity.class);
         startActivity(intent);
         super.onBackPressed();
     }

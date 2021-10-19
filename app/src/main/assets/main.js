@@ -1,6 +1,119 @@
 
 
 
+
+
+
+Parse.Cloud.define("driverStartedFromOrigin", async (request) => {
+
+
+
+  const query = new Parse.Query(Parse.Installation);
+
+   query.equalTo("channels", request.params.channels);
+
+
+  var driverName=request.params.driverName;
+  var placeName=request.params.placeName;
+ // var originName=request.params.originName;
+
+  var time=request.params.time;
+
+ return Parse.Push.send({
+            where:query,
+
+         data: {
+             title:"Driver Started  ",
+             alert:driverName +" started from "+placeName +" at "+time ,
+         }
+     }, { useMasterKey: true });
+
+ });
+
+
+
+Parse.Cloud.define("driverStartedFromDestination", async (request) => {
+
+
+
+  const query = new Parse.Query(Parse.Installation);
+
+   query.equalTo("channels", request.params.channels);
+
+
+  var driverName=request.params.driverName;
+  var placeName=request.params.placeName;
+ // var originName=request.params.originName;
+
+  var time=request.params.time;
+
+ return Parse.Push.send({
+            where:query,
+
+         data: {
+             title:"Driver Started  ",
+             alert:driverName +" started from "+placeName +" at "+time ,
+         }
+     }, { useMasterKey: true });
+
+ });
+
+
+Parse.Cloud.define("driverArrivedOrigin", async (request) => {
+
+
+
+  const query = new Parse.Query(Parse.Installation);
+
+   query.equalTo("channels", request.params.channels);
+
+
+  var driverName=request.params.driverName;
+  var placeName=request.params.placeName;
+ // var originName=request.params.originName;
+
+  var time=request.params.time;
+
+ return Parse.Push.send({
+            where:query,
+
+         data: {
+             title:"Driver Arrived  ",
+             alert:driverName +" arrived "+placeName +" at "+time ,
+         }
+     }, { useMasterKey: true });
+
+ });
+
+
+Parse.Cloud.define("driverArrivedDestination", async (request) => {
+
+
+
+  const query = new Parse.Query(Parse.Installation);
+
+   query.equalTo("channels", request.params.channels);
+
+
+  var driverName=request.params.driverName;
+  var placeName=request.params.placeName;
+ // var originName=request.params.originName;
+
+  var time=request.params.time;
+
+ return Parse.Push.send({
+            where:query,
+
+         data: {
+             title:"Driver Arrived  ",
+             alert:driverName +" arrived "+placeName +" at "+time ,
+         }
+     }, { useMasterKey: true });
+
+ });
+
+
+
 Parse.LiveQuery.on('error', (error) => {
   console.log(error);
 });

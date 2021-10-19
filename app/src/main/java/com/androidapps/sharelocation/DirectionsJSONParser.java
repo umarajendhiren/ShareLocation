@@ -58,7 +58,7 @@ for(int i=0;i<routeArray.length();i++) {
         Log.i("Time :", timeOb.getString("text"));
 
         JSONArray jSteps = legArrayFirstObject.getJSONArray("steps");
-
+        polyPointsString.clear();
         for (int k = 0; k < jSteps.length(); k++) {
             JSONObject stepFirstObject = jSteps.getJSONObject(k);
 

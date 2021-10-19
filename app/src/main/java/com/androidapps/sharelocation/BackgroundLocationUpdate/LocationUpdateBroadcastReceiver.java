@@ -18,6 +18,7 @@ public class LocationUpdateBroadcastReceiver extends BroadcastReceiver {
             Log.d("onReceive: ", String.valueOf(latitude));
 
 
+
          /*   public  static  class LocationUpdateBroadcastReceiver extends BroadcastReceiver {
                 // The BroadcastReceiver used to listen from broadcasts from the service.
 

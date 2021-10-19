@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ChangeAccountDetailsActivity">
+    tools:context=".view.ChangeAccountDetailsActivity">
 
     <EditText
         android:id="@+id/first_name"
@@ -94,7 +94,7 @@ android:text="@{Utilities.getFirstName(viewModel.getUserName())}"
         android:layout_margin="8dp"
         android:hint="Phone Number"
         app:layout_constraintHorizontal_weight="3"
-        android:isNull="@{viewModel.phoneNumber}"
+
         android:text="@{viewModel.phoneNumber}"
 
         android:textAlignment="center"
@@ -102,7 +102,7 @@ android:text="@{Utilities.getFirstName(viewModel.getUserName())}"
         app:layout_constraintStart_toEndOf="@+id/country_code"
         app:layout_constraintTop_toBottomOf="@id/first_name" />
 
-
+<!--android:isNull="@{viewModel.phoneNumber}"-->
 
 
     <androidx.constraintlayout.widget.Group
@@ -283,10 +283,10 @@ android:inputType="text"
 </androidx.constraintlayout.widget.ConstraintLayout>
 
     <data>
-        <import type="com.androidapps.sharelocation.Utilities"/>
+        <import type="com.androidapps.sharelocation.utilities.Utilities"/>
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="com.androidapps.sharelocation.AccountDetailViewModel" />
+            type="com.androidapps.sharelocation.viewmodel.AccountDetailViewModel" />
     </data>
 </layout>

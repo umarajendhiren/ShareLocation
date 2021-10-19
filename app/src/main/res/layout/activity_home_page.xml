@@ -31,12 +31,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
+   <!-- <View
         android:id="@+id/top_border"
         android:layout_width="match_parent"
         android:layout_height="2dp"
       app:layout_constraintBottom_toTopOf="@id/navigation"
-        android:background="#7F8798"/>
+        android:background="#7F8798"/>-->
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
 

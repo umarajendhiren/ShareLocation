@@ -2,7 +2,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.androidapps.sharelocation.HomePageViewModel" />
+            type="com.androidapps.sharelocation.viewmodel.HomePageViewModel" />
     </data>-->
 
 
@@ -15,7 +15,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
  android:layout_weight="4">
-
+v
 
     <TextView
         android:id="@+id/place_name"
@@ -252,10 +252,10 @@ android:visibility="gone"
     <data>
     <variable
         name="pojo"
-        type="com.androidapps.sharelocation.StringToJsonSerialization" />
+        type="com.androidapps.sharelocation.model.StringToJsonSerialization" />
     <variable
         name="viewModel"
-        type="com.androidapps.sharelocation.HomePageViewModel" />
+        type="com.androidapps.sharelocation.viewmodel.HomePageViewModel" />
     <variable
         name="callListener"
         type="com.androidapps.sharelocation.OnClickCallListener" />

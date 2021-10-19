@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context=".CreateAndJoinCircleActivity">
+        tools:context=".view.CreateAndJoinCircleActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/my_toolbar"
@@ -60,7 +60,7 @@
 
         <fragment
             android:id="@+id/create_circle_fragment"
-            android:name="com.androidapps.sharelocation.CreateNewCircleFragmetForDialog"
+            android:name="com.androidapps.sharelocation.view.CreateNewCircleFragmetForDialog"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +70,7 @@
 
         <fragment
             android:id="@+id/join_circle_fragment"
-            android:name="com.androidapps.sharelocation.JoinCircleFragmentForDialog"
+            android:name="com.androidapps.sharelocation.view.JoinCircleFragmentForDialog"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -80,7 +80,7 @@
 
         <fragment
             android:id="@+id/add_person_fragment"
-            android:name="com.androidapps.sharelocation.AddPersonFragment"
+            android:name="com.androidapps.sharelocation.view.AddPersonFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +88,7 @@
 
         <fragment
             android:id="@+id/existing_circle_fragment"
-            android:name="com.androidapps.sharelocation.ExstingCircleNameForInviteCode"
+            android:name="com.androidapps.sharelocation.view.ExstingCircleNameForInviteCode"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -97,14 +97,14 @@
 
         <fragment
             android:id="@+id/add_circle_dp"
-            android:name="com.androidapps.sharelocation.CircleDpFragment"
+            android:name="com.androidapps.sharelocation.view.CircleDpFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
         <fragment
             android:id="@+id/no_network"
-            android:name="com.androidapps.sharelocation.NoNetworkFragment"
+            android:name="com.androidapps.sharelocation.view.NoNetworkFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -122,6 +122,6 @@
 
         <variable
             name="viewmodel"
-            type="com.androidapps.sharelocation.CreateJoinViewModel" />
+            type="com.androidapps.sharelocation.viewmodel.CreateJoinViewModel" />
     </data>
 </layout>

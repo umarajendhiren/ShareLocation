@@ -8,10 +8,10 @@
     <data>
         <variable
             name="pojo"
-            type="com.androidapps.sharelocation.UserDetailsPojo" />
+            type="com.androidapps.sharelocation.model.UserDetailsPojo" />
         <variable
             name="viewModel"
-            type="com.androidapps.sharelocation.HomePageViewModel" />
+            type="com.androidapps.sharelocation.viewmodel.HomePageViewModel" />
     </data>
 
 

@@ -58,15 +58,15 @@
 
         <variable
             name="pojo"
-            type="com.androidapps.sharelocation.UserDetailsPojo" />
+            type="com.androidapps.sharelocation.model.UserDetailsPojo" />
 
 
         <variable
             name="viewModel"
-            type="com.androidapps.sharelocation.HomePageViewModel" />
+            type="com.androidapps.sharelocation.viewmodel.HomePageViewModel" />
 
         <variable
             name="dialog"
-            type="com.androidapps.sharelocation.CircleNameDialogRecyclerView" />
+            type="com.androidapps.sharelocation.adapters.CircleNameDialogRecyclerView" />
     </data>
 </layout>

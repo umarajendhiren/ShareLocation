@@ -13,6 +13,8 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import com.androidapps.sharelocation.view.HomaPageActivity;
+import com.androidapps.sharelocation.view.MainActivity;
 import com.parse.ParsePushBroadcastReceiver;
 
 import static com.parse.Parse.getApplicationContext;

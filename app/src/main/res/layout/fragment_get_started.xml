@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
 
 
-    tools:context=".GetStartedFragment">
+    tools:context=".view.GetStartedFragment">
   <ImageView
       android:id="@+id/family_imageview"
       android:layout_width="match_parent"

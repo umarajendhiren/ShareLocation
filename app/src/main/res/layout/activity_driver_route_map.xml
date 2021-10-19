@@ -182,5 +182,5 @@ app:layout_constraintBottom_toTopOf="@id/guideline"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toEndOf="parent"
         map:layout_constraintTop_toBottomOf="@id/guideline"
-        tools:context=".DriverRouteMapActivity" />
+        tools:context=".view.DriverRouteMapActivity" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,20 +8,20 @@
     <data>
         <variable
             name="pojo"
-            type="com.androidapps.sharelocation.UserDetailsPojo" />
+            type="com.androidapps.sharelocation.model.UserDetailsPojo" />
         <variable
             name="viewModel"
-            type="com.androidapps.sharelocation.RiderViewModel" />
+            type="com.androidapps.sharelocation.viewmodel.RiderViewModel" />
         <variable
             name="callListener"
             type="com.androidapps.sharelocation.OnClickCallListener" />
         <import type="android.content.Context"/>
       <!--  <variable
             name="fragment"
-            type="com.androidapps.sharelocation.DriverMapFragment" />-->
+            type="com.androidapps.sharelocation.view.DriverMapFragment" />-->
         <!--<variable
             name="callListener"
-            type="com.androidapps.sharelocation.DriverListBottomSheetAdapter.OnPhoneCallClickInterface" />
+            type="com.androidapps.sharelocation.adapters.DriverListBottomSheetAdapter.OnPhoneCallClickInterface" />
 
 -->
     </data>
@@ -70,7 +70,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/driver_noitfication"
         android:src="@drawable/ic__bus_stop"
-
+        android:userIdForStopSignVisibility="@{pojo.userObjectId}"
+        android:riderViewModel="@{viewModel}"
        android:onClick="@{()->viewModel.setDriverNotification(String.valueOf(pojo.userObjectId))}"
 
         android:layout_marginTop="8dp"
@@ -86,10 +87,13 @@
         android:layout_height="wrap_content"
         android:id="@+id/route"
         android:layout_marginTop="8dp"
+        android:userIdForStopSignVisibility="@{pojo.userObjectId}"
+        android:riderViewModel="@{viewModel}"
         app:layout_constraintTop_toBottomOf="@id/driver_noitfication"
         app:layout_constraintStart_toStartOf="@id/driver_noitfication"
         app:layout_constraintEnd_toEndOf="@id/driver_noitfication"
         android:src="@drawable/ic_route"
+
         android:onClick="@{()->viewModel.driverRouteMap(String.valueOf(pojo.userObjectId))}"
         />
 

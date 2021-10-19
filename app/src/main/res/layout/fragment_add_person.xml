@@ -80,7 +80,7 @@
         <variable
 
             name="viewModel"
-            type="com.androidapps.sharelocation.CreateJoinViewModel"
+            type="com.androidapps.sharelocation.viewmodel.CreateJoinViewModel"
 
             />
     </data>

@@ -2,11 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.androidapps.sharelocation">
 
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the "MyLocation" functionality.
-    -->
     <application
         android:name=".StarterApplication"
         android:allowBackup="false"
@@ -17,7 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+       <!-- <activity android:name=".TestActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>-->
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -27,11 +28,10 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <activity
-            android:name=".DriverLiveRoute"
-            android:label="@string/title_activity_driver_live_route"></activity>
-
+            android:name=".view.DriverLiveRoute"
+            android:label="@string/title_activity_driver_live_route" />
         <activity
-            android:name=".DriverRouteMapActivity"
+            android:name=".view.DriverRouteMapActivity"
             android:label="@string/title_activity_driver_route_map" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -41,41 +41,41 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <activity android:name=".AddBusStopActivity" />
+        <activity android:name=".viewmodel.AddBusStopActivity" />
         <activity
             android:name=".NearbyTaxi"
             android:label="@string/title_activity_nearby_taxi"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".RiderActivity" />
-        <activity android:name=".DriverActivity" />
+        <activity android:name=".view.RiderActivity" />
+        <activity android:name=".view.DriverActivity" />
         <activity android:name=".StreetView" />
         <activity
-            android:name=".ChangeAccountDetailsActivity"
-            android:parentActivityName=".HomaPageActivity" />
-        <activity android:name=".AddPlacesActivity" />
+
+            android:name=".view.ChangeAccountDetailsActivity"
+            android:parentActivityName=".view.HomaPageActivity"
+            android:theme="@style/AppTheme"/>
+        <activity android:name=".view.AddPlacesActivity" />
         <activity
-            android:name=".CreateAndJoinCircleActivity"
-            android:parentActivityName=".HomaPageActivity" />
+            android:name=".view.CreateAndJoinCircleActivity"
+            android:parentActivityName=".view.HomaPageActivity" />
         <activity
-            android:name=".HomaPageActivity"
+            android:name=".view.HomaPageActivity"
             android:hardwareAccelerated="true"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme">
 
-            <!--
-            <intent-filter>
+           <!-- <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
+            </intent-filter>-->
         </activity>
         <activity
-            android:name=".SetBusStopNotificationActivity"
+            android:name=".view.SetBusStopNotificationActivity"
             android:label="Bus Stops"
             android:theme="@style/MyAlertDialogTheme" />
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:launchMode="singleTop"
             android:noHistory="false">
             <intent-filter>
@@ -84,10 +84,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".HiltTestActivity"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-8155753852159052~1649848191" />
@@ -108,11 +111,11 @@
             android:value="6Gnexs6CgHFE6ilZMLbJCaIaOcV2efGds0Lq1bJs" />
 
         <receiver
-            android:name=".GeofenceBroadcastReceiver"
+            android:name=".BackgroundLocationUpdate.GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="true" /> <!-- android:name="com.parse.ParsePushBroadcastReceiver" -->
         <receiver
-            android:name=".ActivityBroadCastReceiver"
+            android:name=".BackgroundLocationUpdate.ActivityBroadCastReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="com.google.android.gms.permission.ACTIVITY_RECOGNITION">
@@ -142,7 +145,7 @@
         </receiver> <!-- this is for dashboard push -->
         <!-- Add the ParsePushBroadcast Receiver to handle opening up the appropriate activity for notifications -->
         <service
-            android:name=".BackgroundLocationUpdate.GoogleService"
+            android:name=".BackgroundLocationUpdate.LocationUpdateService"
             android:enabled="true"
             android:exported="true" />
         <!--
@@ -185,7 +188,6 @@ This service will automatically send the updated device token to the Parse serve
     <permission
         android:name="com.androidapps.sharelocation.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

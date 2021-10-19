@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:theme="@style/Theme.AppCompat.Light.Dialog"
+
     android:orientation="vertical">
 
     <TextView
@@ -17,7 +17,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bus_stop_dialog"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_margin="16dp"
         />
 </LinearLayout>

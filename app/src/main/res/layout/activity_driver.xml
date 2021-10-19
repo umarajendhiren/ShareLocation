@@ -10,7 +10,7 @@
         android:id="@+id/driver_code_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.androidapps.sharelocation.ShareDriverCodeFragment"
+        android:name="com.androidapps.sharelocation.view.ShareDriverCodeFragment"
 
         />
 

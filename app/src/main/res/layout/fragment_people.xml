@@ -43,7 +43,7 @@ android:textColor="@color/colorAccent"
         android:textStyle="bold"
        android:layout_marginEnd="16dp"
 android:background="@drawable/button_border"
-        android:id="@+id/group_name"
+        android:id="@+id/groupName"
 
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,11 +62,24 @@ android:background="@drawable/button_border"
         android:layout_height="wrap_content"
 android:layout_margin="24dp"
         android:src="@drawable/ic_person_add"
-app:layout_constraintTop_toTopOf="@id/group_name"
-        app:layout_constraintBottom_toBottomOf="@id/group_name"
-        app:layout_constraintStart_toEndOf="@id/group_name"
+app:layout_constraintTop_toTopOf="@id/groupName"
+        app:layout_constraintBottom_toBottomOf="@id/groupName"
+       app:layout_constraintEnd_toEndOf="parent"
 
 
+        />
+
+
+    <ImageView
+        android:id="@+id/leave_circle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_leave_circle"
+        app:layout_constraintTop_toBottomOf="@id/add_person_image"
+
+app:layout_constraintStart_toStartOf="@id/add_person_image"
+        app:layout_constraintEnd_toEndOf="@id/add_person_image"
         />
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -100,6 +113,7 @@ app:layout_constraintTop_toTopOf="@id/group_name"
            android:layout_height="wrap_content"
            android:layout_margin="8dp"
            />
+        <!--android:id="@+id/tv_add_member"-->
 
         <TextView
             android:id="@+id/tv_add_member"

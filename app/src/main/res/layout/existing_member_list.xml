@@ -52,7 +52,7 @@
 
         <variable
             name="pojo"
-            type="com.androidapps.sharelocation.UserDetailsPojo" />
+            type="com.androidapps.sharelocation.model.UserDetailsPojo" />
 
 
 

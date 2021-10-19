@@ -19,6 +19,8 @@ import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
+import com.androidapps.sharelocation.view.MainActivity;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.After;
@@ -26,6 +28,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
+
+import dagger.hilt.android.testing.HiltAndroidRule;
+import kotlinx.coroutines.ExperimentalCoroutinesApi;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
@@ -41,13 +48,19 @@ import static androidx.test.espresso.matcher.ViewMatchers.hasSibling;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
-
 //Add annotation to specify AndroidJUnitRunner class as the default test runner
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4.class)
 
 public class MainActivityInstumentationTest {
     private IdlingResource mIdlingResource;
     private Instrumentation.ActivityResult mActivityResult;
+    @Inject
+    MainFragmentFactory fragmentFactory;
+
+    /*HiltAndroidRule manages the components' state and is used to perform injection on your test:*/
+    @Rule
+    public HiltAndroidRule hiltRule = new HiltAndroidRule(this);
 
     /*This Rule is usually used to grant runtime permissions to avoid the permission dialog from showing up and blocking the App’s Ui*/
     @Rule
@@ -59,6 +72,8 @@ public class MainActivityInstumentationTest {
 
     @Before
     public void registerIdlingResource() {
+
+        hiltRule.inject();
         ActivityScenario activityScenario = ActivityScenario.launch(MainActivity.class);
 
         activityScenario.onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
@@ -82,6 +97,13 @@ public class MainActivityInstumentationTest {
     /*  ActivityScenario activityScenario=ActivityScenario.launch(MainActivity.class).onActivity(
                    activity -> { onView(allOf(withId(R.id.button_get_started), withText("Get Started")));}
            );*/
+
+    @Test
+
+    public void fragmentTest(){
+
+
+    }
 
     @Test
     public void MainActivityGetStartedFlowTest() {
