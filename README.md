@@ -1,6 +1,6 @@
 # ShareLocation
 
-**Libraries Used:**
+## Libraries Used:
 
 * **Amazon's Parse server**:As a backend server,it stores data in the form of a data model.
 * **Parse live query**:To listen for live updates from server.
@@ -18,9 +18,14 @@
 * **Mockito**:Mocking libriry used for Unit testing.
 * **Robolectric**:To test application without emulator.
 
+## API Used:
+* **Google Maps API**:Users can see the real-time location and distance of circle members on the map using Google Maps API.
+* **Google's Distance API**:The Distance Matrix API is a service that provides travel distance and time for a matrix of origins and destinations. The API returns information based on the recommended route between start and end points, as calculated by the Google Maps API.
+* **Roads API**:The Roads API takes up to 100 GPS points collected along a route, and returns a similar set of data, with the points snapped to the most likely roads the vehicle was traveling along. 
 
 
-**The app has following packages:**
+
+## The app has following packages:
 * **BackgroundLocationUpdate**:Contains BroadcastReceiver to receive broadcasts from system and service class to run backround service.
 * **DistanceApiClient**:Contains Retrofit service class to communicate with Google's Diatance Api.
 * **PojoForGSONConverter**:Contains model classes for Distance Api.Gson converter uses this classes for serialization and deserialization.
