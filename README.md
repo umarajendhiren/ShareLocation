@@ -1,5 +1,12 @@
 # ShareLocation
 
+# Project overview:
+* As a User, anyone can create new circle as well as  join in circle that already existing .
+* Members of a circle can view each other's real-time location ,address and distance in miles on a map.
+* Circle member will get notification if anyone in his/her circle enter or exit particular Geofence.
+* Anytime user can leave the circle if they want.
+* Any User can be a Driver or  a Rider.
+
 ## Libraries Used:
 
 * **Amazon's Parse server**:As a backend server,it stores data in the form of a data model.
