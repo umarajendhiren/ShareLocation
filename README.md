@@ -1,16 +1,16 @@
 # ShareLocation
 
 ## Project overview:
-* As a User, anyone can create new circle as well as  join in circle that already exist.
-* Members of a circle can view each other's real-time location ,address and distance in miles on the map.
-* Circle member will get notification if anyone in his/her circle enter or exit particular Geofence.
-* Anytime user can leave the circle if they want.
-* Any User can be a Driver or  a Rider.
-* As a driver, he can add bus stops and routes .Also he can share his real-time route with Riders who are watching him on the map.
-* Also the driver can see all of the riders locations on the same page.
-* As a rider, he can add a driver using unique code to watch his real-time location and live route on the map.
-* The rider will be notified, if the driver enter or exit rider's bus stop.
-* One rider can add more than one driver to track all driver's location at once on the same page.
+* As a user, anyone can create a new circle as well as join one that already exists.
+* Members of a circle can view each other's real-time location,address and distance in miles on the map.
+* A circle member will get notification if anyone in his/her circle enters or exits a particular geofence.
+* Anytime, a user can leave the circle if they want.
+* Any user can be a driver or a passenger.
+* As a driver, he can add bus stops and routes. Also, he can share his real-time route with riders who are watching him on the map.
+* Also, the driver can see all of the riders' locations on the same page.
+* As a rider, he can add a driver using a unique code to watch his real-time location and live route on the map.
+* The rider will be notified if the driver enters or exits the rider's bus stop.
+* One rider can add more than one driver to track all the drivers' locations at once on the same page.
 
 ## Libraries Used:
 
