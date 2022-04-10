@@ -12,6 +12,11 @@
 * The rider will be notified if the driver enters or exits the rider's bus stop.
 * One rider can add more than one driver to track all the drivers' locations at once on the same page.
 
+[![Screenshot-20220408-091840-Share-Location.jpg](https://i.postimg.cc/gjtDgN5C/Screenshot-20220408-091840-Share-Location.jpg)](https://postimg.cc/Zv3pRFJH)
+[![Screenshot-20220408-091904-Share-Location.jpg](https://i.postimg.cc/fLrDDh0k/Screenshot-20220408-091904-Share-Location.jpg)](https://postimg.cc/dkrzjp6K)      
+ [![Screenshot-20220408-093001-Share-Location.jpg](https://i.postimg.cc/3xvBZjZq/Screenshot-20220408-093001-Share-Location.jpg)](https://postimg.cc/RWvKSHy1)
+ [![Screenshot-20220408-092849-Share-Location.jpg](https://i.postimg.cc/gJNq0gYx/Screenshot-20220408-092849-Share-Location.jpg)](https://postimg.cc/Q9KW4kKD)
+
 ## Libraries Used:
 
 * **Amazon's Parse server**:As a backend server,it stores data in the form of a data model.
